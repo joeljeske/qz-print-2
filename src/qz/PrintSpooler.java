@@ -106,7 +106,7 @@ public class PrintSpooler implements Runnable {
         spool.add(currentJob);
     }
     
-    public void append(String data) {
+    public void append(ByteArrayBuilder data) {
         if(currentJob == null) {
             currentJob = new PrintJob("Print Job");
             spool.add(currentJob);

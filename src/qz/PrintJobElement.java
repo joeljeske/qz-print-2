@@ -33,9 +33,9 @@ public class PrintJobElement {
     public String type;
     public PrintJob pj;
     
-    private String data;
+    private ByteArrayBuilder data;
     
-    PrintJobElement(PrintJob pj, String data, String type, Integer sequence) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Integer sequence) {
         
         this.pj = pj;
         this.data = data;
@@ -55,7 +55,7 @@ public class PrintJobElement {
         return prepared;
     }
     
-    public String getData() {
+    public ByteArrayBuilder getData() {
         return data;
     }
     

@@ -26,8 +26,12 @@ package qz;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.applet.Applet;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The PrintApplet is the main component of the Applet
@@ -43,6 +47,7 @@ public class PrintApplet extends Applet {
     private BrowserTools btools;
     private PrintSpooler spooler;
     private Exception currentException;
+    private Charset charset;
     
     @Override
     public void start() {
@@ -57,10 +62,9 @@ public class PrintApplet extends Applet {
         spooler = new PrintSpooler();
         new Thread(spooler).start();
         
+        charset = Charset.defaultCharset();
+        
         btools.notifyBrowser("qzReady");
-        
-        
-        
         
     }
     
@@ -135,22 +139,33 @@ public class PrintApplet extends Applet {
     
     // Javascript functions for spooler actions
     public void append(String data) {
-        spooler.append(data);
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append(data, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.append(bytes);
     }
     
     public void append64(String base64) {
         
         byte[] base64Array = Base64.decode(base64);
-        String data;
-        data = new String(base64Array);
-        LogIt.log(data);
+        ByteArrayBuilder data = new ByteArrayBuilder(base64Array);
         spooler.append(data);
     }
     
     //Stub appendImage function
     // TODO: Implement appendImage
     public void appendImage(String imagePath, String format, Integer width, Integer height) {
-        spooler.append("[IMAGEDATA]\n");
+        
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append("[IMAGEDATA]\n", charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.append(bytes);
     }
     
     public boolean print() {

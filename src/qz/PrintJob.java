@@ -56,7 +56,7 @@ public class PrintJob {
         return title;
     }
     
-    public void append(String appendData) {
+    public void append(ByteArrayBuilder appendData) {
         try {
             PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", sequence);
             sequence++;
@@ -91,6 +91,8 @@ public class PrintJob {
         state = PrintJobState.STATE_QUEUED;
     }
     
+    // Returns a string with the contents of the job data
+    // TODO: This is a debugging/testing function. Not needed for release
     public String getInfo(Integer jobIndex) {
         
         String jobInfo = "";
@@ -99,7 +101,9 @@ public class PrintJob {
         
         while(dataIterator.hasNext()) {
             PrintJobElement pje = (PrintJobElement) dataIterator.next();
-            jobInfo += pje.getData();
+            ByteArrayBuilder bytes = pje.getData();
+            String info = new String(bytes.getByteArray());
+            jobInfo += info;
         }
         
         return jobInfo;
