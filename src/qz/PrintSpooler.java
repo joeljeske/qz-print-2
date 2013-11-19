@@ -136,10 +136,6 @@ public class PrintSpooler implements Runnable {
        return queueInfo;
     }
     
-    public ArrayList<PrintJob> getSpoolObject() {
-        return spool;
-    }
-    
     public String getJobInfo(Integer jobIndex) {
         PrintJob job = spool.get(jobIndex);
         return job.getInfo(jobIndex);

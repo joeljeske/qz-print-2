@@ -31,6 +31,7 @@ import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,13 +80,6 @@ public class PrintApplet extends Applet {
     
     public String getQueueInfo() {
         return spooler.getQueueInfo();
-    }
-    
-    public Object getSpoolObject() {
-        
-        ArrayList<PrintJob> spool = spooler.getSpoolObject();
-        return spool;
-        
     }
     
     public String getJobInfo(Integer jobIndex) {
