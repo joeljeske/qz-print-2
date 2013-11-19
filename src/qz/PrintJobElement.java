@@ -21,6 +21,8 @@
  */
 package qz;
 
+import java.nio.charset.Charset;
+
 /**
  * A PrintJobElement is a piece of a PrintJob that contains a data string,
  * format and sequence number for ordering.
@@ -34,12 +36,14 @@ public class PrintJobElement {
     public PrintJob pj;
     
     private ByteArrayBuilder data;
+    private Charset charset;
     
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Integer sequence) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, Integer sequence) {
         
         this.pj = pj;
         this.data = data;
         this.type = type;
+        this.charset = charset;
         this.sequence = sequence;
         
         prepared = false;
@@ -57,6 +61,10 @@ public class PrintJobElement {
     
     public ByteArrayBuilder getData() {
         return data;
+    }
+    
+    public Charset getCharset() {
+        return charset;
     }
     
 }

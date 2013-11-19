@@ -21,8 +21,12 @@
  */
 package qz;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -56,9 +60,9 @@ public class PrintJob {
         return title;
     }
     
-    public void append(ByteArrayBuilder appendData) {
+    public void append(ByteArrayBuilder appendData, Charset charset) {
         try {
-            PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", sequence);
+            PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", charset, sequence);
             sequence++;
             data.add(pje);
         }
@@ -102,8 +106,13 @@ public class PrintJob {
         while(dataIterator.hasNext()) {
             PrintJobElement pje = (PrintJobElement) dataIterator.next();
             ByteArrayBuilder bytes = pje.getData();
-            String info = new String(bytes.getByteArray());
-            jobInfo += info;
+            String info;
+            try {
+                info = new String(bytes.getByteArray(), pje.getCharset().name());
+                jobInfo += info;
+            } catch (UnsupportedEncodingException ex) {
+                LogIt.log(ex);
+            }
         }
         
         return jobInfo;

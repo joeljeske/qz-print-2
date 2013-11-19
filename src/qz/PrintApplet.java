@@ -29,6 +29,7 @@ import java.applet.Applet;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -145,15 +146,17 @@ public class PrintApplet extends Applet {
         } catch (UnsupportedEncodingException ex) {
             LogIt.log(ex);
         }
-        spooler.append(bytes);
+        spooler.append(bytes, charset);
     }
     
     public void append64(String base64) {
         
         byte[] base64Array = Base64.decode(base64);
         ByteArrayBuilder data = new ByteArrayBuilder(base64Array);
-        spooler.append(data);
+        spooler.append(data, charset);
     }
+    
+    
     
     //Stub appendImage function
     // TODO: Implement appendImage
@@ -165,7 +168,7 @@ public class PrintApplet extends Applet {
         } catch (UnsupportedEncodingException ex) {
             LogIt.log(ex);
         }
-        spooler.append(bytes);
+        spooler.append(bytes, charset);
     }
     
     public boolean print() {
@@ -191,6 +194,17 @@ public class PrintApplet extends Applet {
         currentException = null;
     }
     
+    public void setEncoding(String charset) {
+        // Example:  Charset.forName("US-ASCII");
+        LogIt.log("Default charset encoding: " + Charset.defaultCharset().name());
+        try {
+            this.charset = Charset.forName(charset);
+            LogIt.log("Current applet charset encoding: " + this.charset.name());
+        } catch (IllegalCharsetNameException e) {
+            LogIt.log(Level.WARNING, "Could not find specified charset encoding: "
+                    + charset + ". Using default.", e);
+        }
+    }
     
     // Deprecated functions
     // TODO: Properly address deprecating these functions

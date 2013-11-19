@@ -22,6 +22,7 @@
 
 package qz;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
@@ -106,13 +107,13 @@ public class PrintSpooler implements Runnable {
         spool.add(currentJob);
     }
     
-    public void append(ByteArrayBuilder data) {
+    public void append(ByteArrayBuilder data, Charset charset) {
         if(currentJob == null) {
             currentJob = new PrintJob("Print Job");
             spool.add(currentJob);
         }
         
-        currentJob.append(data);
+        currentJob.append(data, charset);
     }
 
     public boolean print() {
