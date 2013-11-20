@@ -808,7 +808,7 @@ function updateQueueInfo() {
 		queueHtml = "";
 		
 		for(var i=0; i < queueArray.length - 1; i++) {
-			queueHtml += queueArray[i] + " | <a href='javascript:alert(qz.getJobInfo(" + i + "))'>View Job Info</a><br />";
+			queueHtml += queueArray[i] + " | <a href='javascript:console.log(qz.getJobInfo(" + i + "))'>View Job Info</a><br />";
 		}
 	
 		$('#queueInfo').html(queueHtml);
