@@ -130,6 +130,12 @@ public class PrintApplet extends Applet {
 
     
     // Javascript functions for spooler actions
+    
+    /**
+     * Appends String <var>data</var> to the spool after converting to a byte 
+     * array, which will add it to the current job or start a new one.
+     * @param data 
+     */
     public void append(String data) {
         ByteArrayBuilder bytes = new ByteArrayBuilder();
         try {
@@ -140,7 +146,12 @@ public class PrintApplet extends Applet {
         spooler.append(bytes, charset);
     }
     
-    public void append64(final String base64) {
+    /**
+     * Converts String base64 into a byte array then appends the array to the
+     * spool, which will add it to the current job or start a new one
+     * @param base64 
+     */
+    public void append64(String base64) {
         
         byte[] base64Array = null;
         try {
@@ -153,7 +164,21 @@ public class PrintApplet extends Applet {
         spooler.append(data, charset);
     }
     
-    
+    /**
+     * Converts Hex String data into a byte array then appends the array to the
+     * spool, which will add it to the current job or start a new one
+     * @param hexString 
+     */
+    // TODO: This function, when echoed back with getJobInfo testing function,
+    //       seems to have extra newlines between each line. Test with hardware
+    //       or original version to see if this is normal.
+    public void appendHex(String hexString) {
+        
+        byte[] bytes = ByteUtilities.hexStringToByteArray(hexString);
+        ByteArrayBuilder data = new ByteArrayBuilder(bytes);
+        spooler.append(data, charset);
+        
+    }
     
     //Stub appendImage function
     // TODO: Implement appendImage
