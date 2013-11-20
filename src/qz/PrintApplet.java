@@ -30,7 +30,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The PrintApplet is the main component of the Applet
@@ -182,15 +181,15 @@ public class PrintApplet extends Applet {
     
     //Stub appendImage function
     // TODO: Implement appendImage
-    public void appendImage(String imagePath, String format, Integer width, Integer height) {
+    public void appendImage(String imagePath, String lang, Integer imageX, Integer imageY) {
         
         ByteArrayBuilder bytes = new ByteArrayBuilder();
         try {
-            bytes.append("[IMAGEDATA]\n", charset);
+            bytes.append(imagePath, charset);
         } catch (UnsupportedEncodingException ex) {
             LogIt.log(ex);
         }
-        spooler.append(bytes, charset);
+        spooler.appendImage(bytes, charset, lang, imageX, imageY);
     }
     
     public boolean print() {

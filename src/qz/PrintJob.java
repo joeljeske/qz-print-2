@@ -21,12 +21,11 @@
  */
 package qz;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -34,25 +33,31 @@ import java.util.logging.Logger;
  * 
  * @author Thomas Hart
  */
-public class PrintJob {
+public class PrintJob implements Runnable {
     
-    private PrintJobState state;
-    private String title;
-    private ArrayList<PrintJobElement> data;
-    private Integer sequence;
+    private PrintJobState state = PrintJobState.STATE_CREATED;
+    private String title = "Print Job";
+    private ArrayList<PrintJobElement> data = new ArrayList<PrintJobElement>();;
+    private Boolean running = true;
+    private Integer updateDelay = 100;
     
-    PrintJob(String jobTitle) {
-        state = PrintJobState.STATE_CREATED;
-        sequence = 0;
-        this.title = jobTitle;
-        data = new ArrayList<PrintJobElement>();
+    public void run() {
+        while(running) {
+            try {
+                Thread.sleep(updateDelay);
+            } catch (InterruptedException ex) {
+                LogIt.log(ex);
+                running = false;
+            }
+        }
     }
     
     public void cancel() {
         state = PrintJobState.STATE_CANCELLED;
+        running = false;
     }
     
-    public PrintJobState getState() {
+    public PrintJobState getJobState() {
         return state;
     }
     
@@ -62,8 +67,18 @@ public class PrintJob {
     
     public void append(ByteArrayBuilder appendData, Charset charset) {
         try {
-            PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", charset, sequence);
-            sequence++;
+            PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", charset);
+            data.add(pje);
+        }
+        catch(NullPointerException e) {
+            LogIt.log(e);
+        }
+    }
+    
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer imageX, Integer imageY) {
+        
+        try {
+            PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, imageX, imageY);
             data.add(pje);
         }
         catch(NullPointerException e) {
@@ -83,8 +98,12 @@ public class PrintJob {
         ListIterator dataIterator = data.listIterator();
         
         while(dataIterator.hasNext()) {
-            PrintJobElement pje = (PrintJobElement) dataIterator.next();
-            pje.prepare();
+            try {
+                PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                pje.prepare();
+            } catch (IOException ex) {
+                LogIt.log(ex);
+            }
         }
 
         state = PrintJobState.STATE_PROCESSED;
@@ -118,5 +137,5 @@ public class PrintJob {
         return jobInfo;
         
     }
-    
-}
+
+ }

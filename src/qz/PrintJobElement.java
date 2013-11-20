@@ -21,7 +21,14 @@
  */
 package qz;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import javax.imageio.ImageIO;
+import qz.exception.InvalidRawImageException;
 
 /**
  * A PrintJobElement is a piece of a PrintJob that contains a data string,
@@ -37,20 +44,93 @@ public class PrintJobElement {
     
     private ByteArrayBuilder data;
     private Charset charset;
+    private int imageX = 0;
+    private int imageY = 0;
+    private int dotDensity = 32;
+    private LanguageType lang;
     
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, Integer sequence) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer dotDensity) {
+        
+        this.lang = LanguageType.getType(lang);
+        this.dotDensity = dotDensity;
         
         this.pj = pj;
         this.data = data;
         this.type = type;
         this.charset = charset;
-        this.sequence = sequence;
+        
+        prepared = false;
+        
+    }
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, String dotDensity) {
+        
+        this.lang = LanguageType.getType(lang);
+        this.dotDensity = Integer.parseInt(dotDensity);
+        
+        this.pj = pj;
+        this.data = data;
+        this.type = type;
+        this.charset = charset;
+        
+        prepared = false;
+        
+    }
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer imageX, Integer imageY) {
+        
+        this.lang = LanguageType.getType(lang);
+        this.imageX = imageX;
+        this.imageY = imageY;
+        
+        this.pj = pj;
+        this.data = data;
+        this.type = type;
+        this.charset = charset;
+        
+        prepared = false;
+        
+    }
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset) {
+        
+        this.pj = pj;
+        this.data = data;
+        this.type = type;
+        this.charset = charset;
         
         prepared = false;
     }
     
-    public boolean prepare() {
+    public boolean prepare() throws IOException {
         //TODO: Add prepare code
+        
+        // An image file, pull the file into an ImageWrapper and 
+        if(type.equals("IMAGE")) {
+            // Prepare the image
+            String file = new String(data.getByteArray(), charset.name());
+            BufferedImage bi;
+            ImageWrapper iw;
+            if (ByteUtilities.isBase64Image(file)) {
+                byte[] imageData = Base64.decode(file.split(",")[1]);
+                bi = ImageIO.read(new ByteArrayInputStream(imageData));
+            } else {
+                bi = ImageIO.read(new URL(file));
+            }
+            iw = new ImageWrapper(bi, lang);
+            iw.setCharset(charset);
+            // Image density setting (ESCP only)
+            iw.setDotDensity(dotDensity);
+            // Image coordinates, (EPL only)
+            iw.setxPos(imageX);
+            iw.setyPos(imageY);
+            
+            try {
+                this.data = new ByteArrayBuilder(iw.getImageCommand());
+            } catch (InvalidRawImageException ex) {
+                LogIt.log(ex);
+            } catch (UnsupportedEncodingException ex) {
+                LogIt.log(ex);
+            }
+        }
+
         prepared = true;
         return true;
     }

@@ -38,6 +38,7 @@ public class PrintSpooler implements Runnable {
     public boolean running;
     public Integer loopDelay;
     public PrintJob currentJob;
+    public Thread currentJobThread;
     
     private String queueInfo = "";
     private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
@@ -72,7 +73,7 @@ public class PrintSpooler implements Runnable {
 
                         Integer jobIndex = spoolIterator.nextIndex();
                         PrintJob job = spoolIterator.next();
-                        PrintJobState jobState = job.getState();
+                        PrintJobState jobState = job.getJobState();
                         
                         switch(jobState) {
                             case STATE_PROCESSED:
@@ -102,18 +103,30 @@ public class PrintSpooler implements Runnable {
         }
     }
     
-    public void createJob(String jobTitle) {
-        currentJob = new PrintJob(jobTitle);
+    public void createJob() {
+        currentJob = new PrintJob();
+        currentJobThread = new Thread(currentJob);
+        currentJobThread.start();
         spool.add(currentJob);
     }
     
     public void append(ByteArrayBuilder data, Charset charset) {
         if(currentJob == null) {
-            currentJob = new PrintJob("Print Job");
-            spool.add(currentJob);
+            createJob();
         }
         
         currentJob.append(data, charset);
+    }
+    /**
+     * Creates an image PrintJobElement and adds it to the current print job
+     * @param iw 
+     */
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer imageX, Integer imageY) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendImage(imagePath, charset, lang, imageX, imageY);
     }
 
     public boolean print() {
