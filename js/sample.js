@@ -804,11 +804,19 @@ function updateQueueInfo() {
 	
 	if(qz) {
 		queueInfo = qz.getQueueInfo();
+		queueArray = queueInfo.split("\n");
+		queueHtml = "";
 		
+		for(var i=0; i < queueArray.length - 1; i++) {
+			queueHtml += queueArray[i] + " | <a href='javascript:alert(qz.getJobInfo(" + i + "))'>View Job Info</a><br />";
+		}
+	
+		$('#queueInfo').html(queueHtml);
 	}
 	else {
-		queueInfo = "Error: Applet does not appear to be loaded!";
+		//queueInfo = "Error: Applet does not appear to be loaded!";
+		queueInfo = "";
 	}
-	$('#queueInfo').val(queueInfo);
-	
+
 }
+
