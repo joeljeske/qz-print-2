@@ -24,14 +24,11 @@
 
 package qz;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import java.applet.Applet;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
-import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -143,9 +140,15 @@ public class PrintApplet extends Applet {
         spooler.append(bytes, charset);
     }
     
-    public void append64(String base64) {
+    public void append64(final String base64) {
         
-        byte[] base64Array = Base64.decode(base64);
+        byte[] base64Array = null;
+        try {
+            base64Array = Base64.decode(base64);
+        } catch (IOException ex) {
+            LogIt.log(ex);
+        }
+        
         ByteArrayBuilder data = new ByteArrayBuilder(base64Array);
         spooler.append(data, charset);
     }
