@@ -119,7 +119,6 @@ public class PrintSpooler implements Runnable {
     }
     /**
      * Creates an image PrintJobElement and adds it to the current print job
-     * @param iw 
      */
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer imageX, Integer imageY) {
         if(currentJob == null) {
@@ -127,6 +126,14 @@ public class PrintSpooler implements Runnable {
         }
         
         currentJob.appendImage(imagePath, charset, lang, imageX, imageY);
+    }
+
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer dotDensity) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
 
     public boolean print() {

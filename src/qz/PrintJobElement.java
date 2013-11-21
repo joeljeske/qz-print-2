@@ -62,19 +62,7 @@ public class PrintJobElement {
         prepared = false;
         
     }
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, String dotDensity) {
-        
-        this.lang = LanguageType.getType(lang);
-        this.dotDensity = Integer.parseInt(dotDensity);
-        
-        this.pj = pj;
-        this.data = data;
-        this.type = type;
-        this.charset = charset;
-        
-        prepared = false;
-        
-    }
+
     PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer imageX, Integer imageY) {
         
         this.lang = LanguageType.getType(lang);

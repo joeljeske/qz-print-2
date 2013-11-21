@@ -85,7 +85,17 @@ public class PrintJob implements Runnable {
             LogIt.log(e);
         }
     }
-
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer dotDensity) {
+        
+        try {
+            PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, dotDensity);
+            data.add(pje);
+        }
+        catch(NullPointerException e) {
+            LogIt.log(e);
+        }
+    }
+    
     public void print() {
         state = PrintJobState.STATE_READY;
         prepareJob();

@@ -181,6 +181,17 @@ public class PrintApplet extends Applet {
     
     //Stub appendImage function
     // TODO: Implement appendImage
+    public void appendImage(String imagePath, String lang) {
+        
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append(imagePath, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendImage(bytes, charset, lang, 0, 0);
+    }
+    
     public void appendImage(String imagePath, String lang, Integer imageX, Integer imageY) {
         
         ByteArrayBuilder bytes = new ByteArrayBuilder();
@@ -190,6 +201,46 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendImage(bytes, charset, lang, imageX, imageY);
+    }
+    
+    public void appendImage(String imagePath, String lang, String dotDensityString) {
+        
+        Integer dotDensity = 32;
+        
+        if (dotDensityString.equalsIgnoreCase("single")) {
+            dotDensity = 32;
+        } else if (dotDensityString.equalsIgnoreCase("double")) {
+            dotDensity = 33;
+        } else if (dotDensityString.equalsIgnoreCase("triple")) {
+            dotDensity = 39;
+        } else {
+            LogIt.log(Level.WARNING, "Cannot translate dotDensity value of '"
+                    + dotDensityString + "'.  Using '" + dotDensity + "'.");
+        }
+        
+        appendImage(imagePath, lang, dotDensity);
+    }
+    
+    public void appendImage(String imagePath, String lang, Integer dotDensity) {
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append(imagePath, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendImage(bytes, charset, lang, dotDensity);
+    }
+    
+    // Support old appendImage function for url
+    // This just calls appendImageUrl
+    public void appendImage(String url) {
+        appendImageUrl(url);
+    }
+    
+    // Stub function
+    // TODO: Implement appendImageUrl
+    public void appendImageUrl(String url) {
+        
     }
     
     public boolean print() {
