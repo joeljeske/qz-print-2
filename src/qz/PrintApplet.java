@@ -289,6 +289,10 @@ public class PrintApplet extends Applet {
         }
     }
     
+    public void printToFile(String filePath) {
+        spooler.printToFile(filePath);
+    }
+    
     public String getVersion() {
         return VERSION;
     }

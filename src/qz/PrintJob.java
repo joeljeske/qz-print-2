@@ -21,6 +21,7 @@
  */
 package qz;
 
+import java.awt.print.PrinterJob;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -40,6 +41,7 @@ public class PrintJob implements Runnable {
     private ArrayList<PrintJobElement> data = new ArrayList<PrintJobElement>();;
     private Boolean running = true;
     private Integer updateDelay = 100;
+    private Printer printer;
     
     public void run() {
         while(running) {
@@ -106,11 +108,6 @@ public class PrintJob implements Runnable {
         data.add(pje);
     }
     
-    public void print() {
-        state = PrintJobState.STATE_READY;
-        prepareJob();
-    }
-    
     public void prepareJob() {
         
         state = PrintJobState.STATE_PROCESSING;
@@ -136,7 +133,7 @@ public class PrintJob implements Runnable {
     
     // Returns a string with the contents of the job data
     // TODO: This is a debugging/testing function. Not needed for release
-    public String getInfo(Integer jobIndex) {
+    public String getInfo() {
         
         String jobInfo = "";
         
@@ -156,6 +153,20 @@ public class PrintJob implements Runnable {
         
         return jobInfo;
         
+    }
+    
+    // TODO: Stub for now.
+    public void print() {
+        state = PrintJobState.STATE_SENDING;
+        
+        //PrinterJob pj = PrinterJob.getPrinterJob();
+        //pj.setPrintable(printer);
+        
+        state = PrintJobState.STATE_COMPLETE;
+    }
+    
+    public void setPrinter(Printer printer) {
+        this.printer = printer;
     }
 
  }

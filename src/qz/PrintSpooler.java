@@ -43,6 +43,8 @@ public class PrintSpooler implements Runnable {
     private String queueInfo = "";
     private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
+    private Printer currentPrinter;
+    private FilePrinter filePrinter;
     
     public void PrintSpooler() {
         
@@ -56,7 +58,7 @@ public class PrintSpooler implements Runnable {
         
         // Initialize system variables
         running = true;
-        
+        filePrinter = new FilePrinter();
         // Configurable variables
         loopDelay = 1000;
     
@@ -78,6 +80,9 @@ public class PrintSpooler implements Runnable {
                         switch(jobState) {
                             case STATE_PROCESSED:
                                 job.queue();
+                                break;
+                            case STATE_QUEUED:
+                                // if printer is available, print the job
                                 break;
                             default:
                                 break;
@@ -157,9 +162,22 @@ public class PrintSpooler implements Runnable {
             return false;
         }
         
-        currentJob.print();
+        //currentJob.setPrinter = currentPrinter;
+        currentJob.prepareJob();
         currentJob = null;
         return true;
+    }
+    
+    public void printToFile(String filePath) {
+        if(currentJob != null) {
+            //currentJob.setPrinter = filePrinter;
+            
+            filePrinter.setOutputPath(filePath);
+            currentJob.setPrinter(filePrinter);
+            
+            currentJob.prepareJob();
+            currentJob = null;
+        }
     }
     
     public void cancelJob(Integer jobIndex) {
@@ -174,7 +192,7 @@ public class PrintSpooler implements Runnable {
     
     public String getJobInfo(Integer jobIndex) {
         PrintJob job = spool.get(jobIndex);
-        return job.getInfo(jobIndex);
+        return job.getInfo();
     }
     
 }
