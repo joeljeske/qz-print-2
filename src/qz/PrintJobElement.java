@@ -28,7 +28,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.DOMException;
+import org.xml.sax.SAXException;
 import qz.exception.InvalidRawImageException;
+import qz.exception.NullCommandException;
 
 /**
  * A PrintJobElement is a piece of a PrintJob that contains a data string,
@@ -48,6 +52,7 @@ public class PrintJobElement {
     private int imageY = 0;
     private int dotDensity = 32;
     private LanguageType lang;
+    private String xmlTag;
     
     PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer dotDensity) {
         
@@ -77,6 +82,19 @@ public class PrintJobElement {
         prepared = false;
         
     }
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String xmlTag) {
+        
+        this.xmlTag = xmlTag;
+        
+        this.pj = pj;
+        this.data = data;
+        this.type = type;
+        this.charset = charset;
+        
+        prepared = false;
+        
+    }
+
     PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset) {
         
         this.pj = pj;
@@ -88,12 +106,24 @@ public class PrintJobElement {
     }
     
     public boolean prepare() throws IOException {
-        //TODO: Add prepare code
-        
-        // An image file, pull the file into an ImageWrapper and 
+
+        //TODO: Add prepare code for all types
+        /*
+            RAW
+            IMAGE
+            IMAGE_PS
+            XML
+            HTML
+            PDF
+        */
+
+        // An image file, pull the file into an ImageWrapper and get the 
+        // encoded data
         if(type.equals("IMAGE")) {
+            
             // Prepare the image
             String file = new String(data.getByteArray(), charset.name());
+            
             BufferedImage bi;
             ImageWrapper iw;
             if (ByteUtilities.isBase64Image(file)) {
@@ -117,6 +147,26 @@ public class PrintJobElement {
             } catch (UnsupportedEncodingException ex) {
                 LogIt.log(ex);
             }
+        }
+        else if(type.equals("XML")) {
+            String file = new String(data.getByteArray(), charset.name());
+            String dataString;
+            byte[] dataByteArray;
+            
+            try {
+                dataString = FileUtilities.readXMLFile(file, xmlTag);
+                dataByteArray = Base64.decode(dataString);
+                data = new ByteArrayBuilder(dataByteArray);
+            } catch (DOMException ex) {
+                LogIt.log(ex);
+            } catch (NullCommandException ex) {
+                LogIt.log(ex);
+            } catch (ParserConfigurationException ex) {
+                LogIt.log(ex);
+            } catch (SAXException ex) {
+                LogIt.log(ex);
+            }
+            
         }
 
         prepared = true;

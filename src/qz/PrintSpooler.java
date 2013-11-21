@@ -135,7 +135,15 @@ public class PrintSpooler implements Runnable {
         
         currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
-
+    
+    public void appendXML(ByteArrayBuilder url, String xmlTag) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendXML(url, xmlTag);
+    }
+    
     public boolean print() {
         if(currentJob == null) {
             return false;

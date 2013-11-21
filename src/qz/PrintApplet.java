@@ -243,6 +243,16 @@ public class PrintApplet extends Applet {
         
     }
     
+    public void appendXML(String url, String xmlTag) {
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append(url, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendXML(bytes, xmlTag);
+    }
+    
     public boolean print() {
         if(spooler.print()) {
             LogIt.log("Print Successful");

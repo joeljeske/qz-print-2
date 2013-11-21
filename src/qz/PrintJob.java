@@ -95,6 +95,11 @@ public class PrintJob implements Runnable {
             LogIt.log(e);
         }
     }
+
+    public void appendXML(ByteArrayBuilder url, String xmlTag) {
+        PrintJobElement pje = new PrintJobElement(this, url, "XML", Charset.defaultCharset(), xmlTag);
+        data.add(pje);
+    }
     
     public void print() {
         state = PrintJobState.STATE_READY;
