@@ -96,8 +96,13 @@ public class PrintJob implements Runnable {
         }
     }
 
-    public void appendXML(ByteArrayBuilder url, String xmlTag) {
-        PrintJobElement pje = new PrintJobElement(this, url, "XML", Charset.defaultCharset(), xmlTag);
+    public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
+        PrintJobElement pje = new PrintJobElement(this, url, "XML", charset, xmlTag);
+        data.add(pje);
+    }
+    
+    public void appendFile(ByteArrayBuilder url, Charset charset) {
+        PrintJobElement pje = new PrintJobElement(this, url, "FILE", charset);
         data.add(pje);
     }
     

@@ -243,6 +243,14 @@ public class PrintApplet extends Applet {
         
     }
     
+    /**
+     * Gets the first XML node identified by <code>tagName</code>, reads its
+     * contents and appends it to the buffer. Assumes XML content is base64
+     * formatted.
+     * 
+     * @param url
+     * @param xmlTag 
+     */
     public void appendXML(String url, String xmlTag) {
         ByteArrayBuilder bytes = new ByteArrayBuilder();
         try {
@@ -250,7 +258,24 @@ public class PrintApplet extends Applet {
         } catch (UnsupportedEncodingException ex) {
             LogIt.log(ex);
         }
-        spooler.appendXML(bytes, xmlTag);
+        spooler.appendXML(bytes, charset, xmlTag);
+    }
+    
+    /**
+     * appendFile will read a text file and append the data directly without
+     * any translation
+     * 
+     * @param url 
+     */
+    public void appendFile(String url) {
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+            
+        try {
+            bytes.append(url, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendFile(bytes, charset);
     }
     
     public boolean print() {

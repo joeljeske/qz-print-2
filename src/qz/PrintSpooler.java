@@ -136,12 +136,20 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
     
-    public void appendXML(ByteArrayBuilder url, String xmlTag) {
+    public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         if(currentJob == null) {
             createJob();
         }
         
-        currentJob.appendXML(url, xmlTag);
+        currentJob.appendXML(url, charset, xmlTag);
+    }
+
+    public void appendFile(ByteArrayBuilder url, Charset charset) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendFile(url, charset);
     }
     
     public boolean print() {

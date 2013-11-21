@@ -166,7 +166,10 @@ public class PrintJobElement {
             } catch (SAXException ex) {
                 LogIt.log(ex);
             }
-            
+        }
+        else if(type.equals("FILE")) {
+            String file = new String(data.getByteArray(), charset.name());
+            data = new ByteArrayBuilder(FileUtilities.readRawFile(file));
         }
 
         prepared = true;
