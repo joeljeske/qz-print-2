@@ -432,9 +432,9 @@ function printToFile() {
 	 if (isLoaded()) {
 			// Send characters/raw commands to qz using "append"
 			// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
-			qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\n");
-			qz.append("A590,1570,2,3,1,1,N,\"Testing the print() function\"\n");
-			qz.append("P1\n");
+			qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\r\n");
+			qz.append("A590,1570,2,3,1,1,N,\"Testing the print() function\"\r\n");
+			qz.append("P1\r\n");
 			
 			// Send characters/raw commands to file
 			// Ex:  qz.printToFile("\\\\server\\printer");
