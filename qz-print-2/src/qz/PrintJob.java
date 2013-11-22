@@ -21,12 +21,16 @@
  */
 package qz;
 
+import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.print.PrintService;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -159,14 +163,48 @@ public class PrintJob implements Runnable {
     public void print() {
         state = PrintJobState.STATE_SENDING;
         
-        //PrinterJob pj = PrinterJob.getPrinterJob();
-        //pj.setPrintable(printer);
+        ByteArrayBuilder jobData = new ByteArrayBuilder();
+        
+        // Concatenate all the PrintJobElements into one ByteArrayBuilder
+        ListIterator dataIterator = data.listIterator();
+        
+        while(dataIterator.hasNext()) {
+            PrintJobElement pje = (PrintJobElement) dataIterator.next();
+            ByteArrayBuilder bytes = pje.getData();
+            jobData.append(bytes.getByteArray());
+        }
+        
+        
+        
+        if(printer.getType().equals("FILE")) {
+            try {
+                printer.print(jobData);
+            }
+            catch(PrinterException ex) {
+                LogIt.log(ex);
+            }
+        }
+        else {
+            PrintService ps = printer.getPrintService();
+            PrinterJob pj = PrinterJob.getPrinterJob();
+            try {
+                pj.setPrintService(ps);
+            } catch (PrinterException ex) {
+                LogIt.log(ex);
+            }
+            
+            // TODO: Finish implementing this function for print jobs that aren't "to file"
+        }
         
         state = PrintJobState.STATE_COMPLETE;
     }
     
     public void setPrinter(Printer printer) {
         this.printer = printer;
+    }
+    
+    public Printer getPrinter() {
+        return printer;
     }
 
  }

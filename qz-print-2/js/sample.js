@@ -5,16 +5,16 @@ var qz;   // Our main applet
  */
 function isLoaded() {
 	if (!qz) {
-		alert('Error:\n\n\tPrint plugin is NOT loaded!');
+		console.log('Error:\n\n\tPrint plugin is NOT loaded!');
 		return false;
 	} else {
 		try {
 			if (!qz.isActive()) {
-				alert('Error:\n\n\tPrint plugin is loaded but NOT active!');
+				console.log('Error:\n\n\tPrint plugin is loaded but NOT active!');
 				return false;
 			}
 		} catch (err) {
-			alert('Error:\n\n\tPrint plugin is NOT loaded properly!');
+			console.log('Error:\n\n\tPrint plugin is NOT loaded properly!');
 			return false;
 		}
 	}

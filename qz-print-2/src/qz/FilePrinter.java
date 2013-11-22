@@ -23,14 +23,16 @@ package qz;
 
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
+import javax.print.PrintService;
 
 /**
- *
+ * FilePrinter is a special type of Printer that outputs to a file
+ * 
  * @author Thomas Hart II
  */
-public class FilePrinter extends Printer {
+public class FilePrinter implements Printer {
     
     private final String name = "File Printer";
     private String outputPath;
@@ -47,8 +49,24 @@ public class FilePrinter extends Printer {
         return name;
     }
 
-    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean ready() {
+        // FilePrinter is always ready
+        return true;
+    }
+
+    public PrintService getPrintService() {
+        // No PrintService associated with FilePrinter.
+        // This function should not be called
+        return null;
+    }
+
+    public String getType() {
+        return "FILE";
+    }
+
+    public void print(ByteArrayBuilder data) throws PrinterException {
+        LogIt.log("Printing to file: " + outputPath);
+        LogIt.log("Print data: " + new String(data.getByteArray()));
     }
     
 }

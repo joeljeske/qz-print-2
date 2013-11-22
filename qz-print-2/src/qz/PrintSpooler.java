@@ -76,13 +76,16 @@ public class PrintSpooler implements Runnable {
                         Integer jobIndex = spoolIterator.nextIndex();
                         PrintJob job = spoolIterator.next();
                         PrintJobState jobState = job.getJobState();
-                        
+
                         switch(jobState) {
                             case STATE_PROCESSED:
                                 job.queue();
                                 break;
                             case STATE_QUEUED:
-                                // if printer is available, print the job
+                                // Get Printer Status from the job
+                                if(job.getPrinter().ready()) {
+                                    job.print();
+                                }
                                 break;
                             default:
                                 break;

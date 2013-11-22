@@ -21,8 +21,11 @@
  */
 package qz;
 
+import java.awt.Graphics;
+import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.print.PrinterJob;
+import java.awt.print.PrinterException;
+import javax.print.PrintService;
 
 /**
  * Printer is an abstract class that defines the common functionality of all
@@ -30,8 +33,36 @@ import java.awt.print.PrinterJob;
  * 
  * @author Thomas Hart II
  */
-public abstract class Printer implements Printable {
+public interface Printer {
 
-    abstract String getName();
+    // getName should return a String representation of the Printer's name
+    public abstract String getName();
     
+    // Print is implmemented from the Printable interface.
+    // This function does the heavy lifting of actually pushing data to 
+    // the printer.
+    public abstract void print(ByteArrayBuilder data) throws PrinterException;
+    
+    /**
+     * Returns a boolean value based on whether the printer is ready to accept 
+     * a job
+     * 
+     * @return Boolean, true if printer is ready
+    */ 
+    public abstract boolean ready();
+    
+    /**
+     * Returns the PrintService associated with this Printer
+     * 
+     * @return 
+     */
+    public abstract PrintService getPrintService();
+    
+    /**
+     * Returns a String with the type of printer
+     * Possibilities: RAW, PS, FILE, DEBUG
+     * 
+     * @return The printer type
+     */
+    public abstract String getType();
 }
