@@ -1,8 +1,29 @@
 var qz;   // Our main applet
 
+/*
+ * Returns true if the applet is loaded and ready
+ */
+function isLoaded() {
+	if (!qz) {
+		alert('Error:\n\n\tPrint plugin is NOT loaded!');
+		return false;
+	} else {
+		try {
+			if (!qz.isActive()) {
+				alert('Error:\n\n\tPrint plugin is loaded but NOT active!');
+				return false;
+			}
+		} catch (err) {
+			alert('Error:\n\n\tPrint plugin is NOT loaded properly!');
+			return false;
+		}
+	}
+	return true;
+}
+
 function findPrinter() {
 	 var p = document.getElementById('printer');
-	 if (qz) {
+	 if (isLoaded()) {
 			// Searches for locally installed printer wiht specified name
 			qz.findPrinter(p.value);
 	 }
@@ -15,7 +36,7 @@ function findPrinter() {
 
 function findPrinters() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Searches for locally installed printer with "zebra" in the name
 			qz.findPrinter("\\{dummy printer name for listing\\}");
 	 }
@@ -25,7 +46,7 @@ function findPrinters() {
 
 function print() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Send characters/raw commands to qz using "append"
 			// This example is for EPL.  Please adapt to your printer language
 			// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
@@ -68,7 +89,7 @@ function print() {
 }
 
 function printESCPImage() {
-	if (qz) {
+	if (isLoaded()) {
 			// Append a black & white image.  If there are non b&w pixels, they'll
 			// be converted to black or white based on a general lumen calculation.
 			// In the case of "ESCP", an optional 3rd parameter "dotDensity" can be
@@ -102,7 +123,7 @@ function printESCPImage() {
 
 function printZPLImage() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Sample text
 			qz.append("^XA\n");
 			qz.append("^FO50,50^ADN,36,20^FDPRINTED USING QZ PRINT PLUGIN " + qz.getVersion() + "\n"); 
@@ -136,7 +157,7 @@ function printZPLImage() {
 
 function print64() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Use qz-print's `"append64"` function. This will automatically convert provided
 			// base64 encoded text into ascii/bytes, etc.
 			qz.append64("QTU5MCwxNjAwLDIsMywxLDEsTiwialplYnJhIHNhbXBsZS5odG1sIgpBNTkwLDE1NzAsMiwzLDEsMSxOLCJUZXN0aW5nIHRoZSBwcmludDY0KCkgZnVuY3Rpb24iClAxCg==");
@@ -153,7 +174,7 @@ function print64() {
 
 function printPages() {
 	 
-	 if (qz) { 
+	 if (isLoaded()) { 
 			// Mark the end of a label, in this case  P1 plus a newline character
 			// qz-print knows to look for this and treat this as the end of a "page"
 			// for better control of larger spooled jobs (i.e. 50+ labels)
@@ -180,7 +201,7 @@ function printPages() {
 
 function printXML() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Appends the contents of an XML file from a SOAP response, etc.
 			// a valid relative URL or a valid complete URL is required for the XML
 			// file.  The second parameter must be a valid XML tag/node containing
@@ -203,7 +224,7 @@ function printXML() {
 
 function printHex() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Since 1.5.4, No backslashes needed (fixes \x00 NUL JavaScript bug)
 			// Can be in format "1B00" or "x1Bx00"
 			// EPL Sample Provided
@@ -239,7 +260,7 @@ function printHex() {
 
 function printFile(file) {
 			
-			if (qz) {
+			if (isLoaded()) {
 				 // Using qz-print's "appendFile()" function, a file containg your raw EPL/ZPL
 				 // can be sent directly to the printer
 				 // Example: 
@@ -257,7 +278,7 @@ function printFile(file) {
 
 function printImage(scaleImage) {
 			
-			if (qz) {
+			if (isLoaded()) {
 				 // Using qz-print's "appendImage()" function, a png, jpeg file
 				 // can be sent directly to the printer supressing the print dialog
 				 // Example:
@@ -312,7 +333,7 @@ function printImage(scaleImage) {
 
 function printPDF() {
 		
-			if (qz) {
+			if (isLoaded()) {
 				 qz.findPrinter("\\{dummy printer name for listing\\}");
 				 while (!qz.isDoneFinding()) {
 							// Note, enless while loops are bad practice.
@@ -356,7 +377,7 @@ function getPath() {
 
 function printHTML() {
 			
-			if (qz) {
+			if (isLoaded()) {
 				 qz.findPrinter("\\{dummy printer name for listing\\}");
 				 while (!qz.isDoneFinding()) {
 						 // Wait
@@ -408,7 +429,7 @@ function fixHTML(html) { return html.replace(/ /g, "&nbsp;").replace(//g, "'").
 
 function printToFile() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Send characters/raw commands to qz using "append"
 			// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
 			qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\n");
@@ -429,7 +450,7 @@ function printToFile() {
 
 function printToHost() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Send characters/raw commands to applet using "append"
 			// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
 			qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\n");
@@ -456,7 +477,7 @@ function chr(i) {
 // "qzDonePrinting()" and handle your next steps there.
 function monitorPrinting() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDonePrinting()) {
 				window.setTimeout('monitorPrinting()', 100);
 		 } else {
@@ -471,7 +492,7 @@ function monitorPrinting() {
 
 function monitorFinding() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDoneFinding()) {
 				window.setTimeout('monitorFinding()', 100);
 		 } else {
@@ -485,7 +506,7 @@ function monitorFinding() {
 
 function monitorFinding2() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDoneFinding()) {
 				window.setTimeout('monitorFinding2()', 100);
 		 } else {
@@ -506,7 +527,7 @@ function monitorFinding2() {
 // "qzDoneAppending()" and handle your next steps there.
 function monitorAppending() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDoneAppending()) {
 				window.setTimeout('monitorAppending()', 100);
 		 } else {
@@ -527,7 +548,7 @@ function monitorAppending() {
 // "qzDoneAppending()" and handle your next steps there.
 function monitorAppending2() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDoneAppending()) {
 				window.setTimeout('monitorAppending2()', 100);
 		 } else {
@@ -548,7 +569,7 @@ function monitorAppending2() {
 // "qzDoneAppending()" and handle your next steps there.
 function monitorAppending3() {
 	
-	if (qz) {
+	if (isLoaded()) {
 		 if (!qz.isDoneAppending()) {
 				window.setTimeout('monitorAppending3()', 100);
 		 } else {
@@ -567,7 +588,7 @@ function monitorAppending3() {
 
 function useDefaultPrinter() {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 			// Searches for default printer
 			qz.findPrinter();
 	 }
@@ -579,7 +600,7 @@ function qzReady() {
 		// Change title to reflect version
 		qz = document.getElementById('qz'); // no longer needed
 		var title = document.getElementById("title");
-		if (qz) {
+		if (isLoaded()) {
 				try {
 					title.innerHTML = title.innerHTML + " " + qz.getVersion();
 					document.getElementById("content").style.background = "#F0F0F0";
@@ -606,7 +627,7 @@ function qzReady() {
  */
 function allowMultiple() {
 		
-		if (qz) {
+		if (isLoaded()) {
 				var multiple = qz.getAllowMultipleInstances();
 				qz.allowMultipleInstances(!multiple);
 				alert('Allowing of multiple applet instances set to "' + !multiple + '"');
@@ -614,7 +635,7 @@ function allowMultiple() {
 }
 
 function listNetworkInfo() {
-		if (qz) {
+		if (isLoaded()) {
 				// Makes a quick connection to www.google.com to determine the active interface
 				// Note, if you don't wish to use google.com, you can customize the host and port
 				// qz.getNetworkUtilities().setHostname("qzindustries.com");
@@ -625,7 +646,7 @@ function listNetworkInfo() {
 
 // Automatically called when qz.findNetworkAdapters() is finished
 function qzDoneFindingNetwork() {
-		if (qz) {
+		if (isLoaded()) {
 				alert("Primary adapter found: " + qz.getMac() + ", IP: " + qz.getIP());
 		}
 }
@@ -639,7 +660,7 @@ function printPage() {
 
 function printBase64Image(base64data) {
 	 
-	 if (qz) {
+	 if (isLoaded()) {
 				 qz.findPrinter("\\{dummy printer name for listing\\}");
 				 while (!qz.isDoneFinding()) {
 							// Note, endless while loops are bad practice.
@@ -674,7 +695,7 @@ function printBase64Image(base64data) {
 }
 
 function logFeatures() {
-		if (qz) {
+		if (isLoaded()) {
 				
 				var logging = qz.getLogPostScriptFeatures();
 				qz.setLogPostScriptFeatures(!logging);
@@ -684,7 +705,7 @@ function logFeatures() {
 
 function useAlternatePrinting() {
 		
-		if (qz) {
+		if (isLoaded()) {
 				var alternate = qz.isAlternatePrinting();
 				qz.useAlternatePrinting(!alternate);
 				alert('Alternate CUPS printing set to "' + !alternate + '"');
@@ -693,7 +714,7 @@ function useAlternatePrinting() {
 		
 // Asks qz-print to list all available serial ports
 function listSerialPorts() {
-			if (qz) {
+			if (isLoaded()) {
 					qz.findPorts();  // qz-print will trigger qzDoneFindingPorts() once complete
 			} else {
 					alert("Applet does not appear to be loaded!");
@@ -702,7 +723,7 @@ function listSerialPorts() {
 
 // Called automatically by qz-print after "qz.findPorts()" is called
 function qzDoneFindingPorts() {
-	if (qz) {
+	if (isLoaded()) {
 			var ports = qz.getPorts().split(",");
 			for (p in ports) {
 					if (p == 0) {
@@ -717,7 +738,7 @@ function qzDoneFindingPorts() {
 
 // Asks qz-print to open the specified serial port
 function openSerialPort() {
-			if (qz) {
+			if (isLoaded()) {
 					qz.openPort(document.getElementById("port_name").value);  // qz-print will trigger qzDoneOpeningPort() once complete
 			} else {
 					alert("Applet does not appear to be loaded!");
@@ -726,7 +747,7 @@ function openSerialPort() {
 
 // Asks qz-print to close the specified serial port
 function closeSerialPort() {
-			if (qz) {
+			if (isLoaded()) {
 					qz.closePort(document.getElementById("port_name").value);  // qz-print will trigger qzDoneClosingPort() once complete
 			} else {
 					alert("Applet does not appear to be loaded!");
@@ -735,7 +756,7 @@ function closeSerialPort() {
 
 // Automatically gets fired with the port is finished opening (even if it fails to open)
 function qzDoneOpeningPort(portName) {
-		if (qz) {
+		if (isLoaded()) {
 				var e = qz.getException();
 				if (e) {
 						alert("Could not open port [" + portName + "] \n\t" + e.getLocalizedMessage());
@@ -750,7 +771,7 @@ function qzDoneOpeningPort(portName) {
 
 // Automatically gets fired with the port is finished closing (even if it fails to close)
 function qzDoneClosingPort(portName) {
-		if (qz) {
+		if (isLoaded()) {
 				var e = qz.getException();
 				if (e) {
 						alert("Could not close port [" + portName + "] \n\t" + e.getLocalizedMessage());
@@ -765,7 +786,7 @@ function qzDoneClosingPort(portName) {
 
 function sendSerialData() {
 			
-			if (qz) {
+			if (isLoaded()) {
 					// Beggining and ending patterns that signify port has responded
 					// chr(2) and chr(13) surround data on a Mettler Toledo Scale
 					qz.setSerialBegin(chr(2));
@@ -802,7 +823,7 @@ function qzSerialReturned(portName, data) {
 function updateQueueInfo() {
 	var queueInfo;
 	
-	if(qz) {
+	if (isLoaded()) {
 		queueInfo = qz.getQueueInfo();
 		queueArray = queueInfo.split("\n");
 		queueHtml = "";
