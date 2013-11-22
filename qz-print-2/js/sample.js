@@ -1,4 +1,11 @@
-var qz;   // Our main applet
+// Our main applet
+var qz; 
+
+// When the document is loaded
+$(document).ready(function() {
+	// set updateQueueInfo to trigger every second
+	queueUpdateInterval = setInterval(updateQueueInfo, 1000);
+});
 
 /*
  * Returns true if the applet is loaded and ready
@@ -600,10 +607,13 @@ function qzReady() {
 		// Change title to reflect version
 		qz = document.getElementById('qz'); // no longer needed
 		var title = document.getElementById("title");
+		var loaded = document.getElementById("loaded");
+		
 		if (isLoaded()) {
 				try {
 					title.innerHTML = title.innerHTML + " " + qz.getVersion();
-					document.getElementById("content").style.background = "#F0F0F0";
+					loaded.style.background = "#0F0";
+					loaded.innerHTML = "Loaded";
 				} catch(err) { // LiveConnect error, display a detailed meesage
 					document.getElementById("content").style.background = "#F5A9A9";
 					alert("ERROR:  \nThe applet did not load correctly.  Communication to the " + 

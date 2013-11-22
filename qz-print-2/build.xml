@@ -78,6 +78,8 @@
         <copy file="${basedir}/misc/zpl_sample.xml" tofile="${basedir}/dist/misc/zpl_sample.xml" overwrite="true" encoding="UTF-8" />
         <copy file="${basedir}/misc/pdf_sample.pdf" tofile="${basedir}/dist/misc/pdf_sample.pdf" overwrite="true" encoding="UTF-8" />
 
+        <copy file="${basedir}/css/sample.css" tofile="${basedir}/dist/css/sample.css" overwrite="true" encoding="UTF-8" />
+
         <copy file="${basedir}/js/jquery-1.7.1.js" tofile="${basedir}/dist/js/jquery-1.7.1.js" overwrite="true" encoding="UTF-8" />
         <copy file="${basedir}/js/jquery.plugin.html2canvas.js" tofile="${basedir}/dist/js/jquery.plugin.html2canvas.js" overwrite="true" encoding="UTF-8" />
         <copy file="${basedir}/js/html2canvas.js" tofile="${basedir}/dist/js/html2canvas.js" overwrite="true" encoding="UTF-8" />
