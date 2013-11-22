@@ -25,6 +25,11 @@ import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.print.PrintService;
 
 /**
@@ -66,7 +71,17 @@ public class FilePrinter implements Printer {
 
     public void print(ByteArrayBuilder data) throws PrinterException {
         LogIt.log("Printing to file: " + outputPath);
-        LogIt.log("Print data: " + new String(data.getByteArray()));
+        
+        try {
+             FileOutputStream fos = new FileOutputStream(outputPath);
+             fos.write(data.getByteArray());
+             fos.close();
+        } catch (FileNotFoundException ex) {
+            LogIt.log(ex);
+        } catch (IOException ex) {
+            LogIt.log(ex);
+        }
+        
     }
     
 }
