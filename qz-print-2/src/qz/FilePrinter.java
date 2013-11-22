@@ -83,5 +83,10 @@ public class FilePrinter implements Printer {
         }
         
     }
+
+    // Empty function. FilePrinter's should never have a ps set
+    public void setPrintService(PrintService ps) {
+        
+    }
     
 }

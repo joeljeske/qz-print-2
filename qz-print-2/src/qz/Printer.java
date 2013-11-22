@@ -52,6 +52,11 @@ public interface Printer {
     public abstract boolean ready();
     
     /**
+     * Sets the PrintService associated with this Printer
+     */
+    public abstract void setPrintService(PrintService ps);
+    
+    /**
      * Returns the PrintService associated with this Printer
      * 
      * @return 

@@ -184,6 +184,14 @@ public class PrintJob implements Runnable {
                 LogIt.log(ex);
             }
         }
+        else if(printer.getType().equals("DEBUG")) {
+            try {
+                printer.print(jobData);
+            }
+            catch(PrinterException ex) {
+                LogIt.log(ex);
+            }
+        }
         else {
             PrintService ps = printer.getPrintService();
             PrinterJob pj = PrinterJob.getPrinterJob();

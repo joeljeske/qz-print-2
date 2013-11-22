@@ -62,6 +62,9 @@ public class PrintSpooler implements Runnable {
         // Configurable variables
         loopDelay = 1000;
     
+        // Default Printer
+        currentPrinter = new DebugPrinter();
+        
         // Main loop - run every loopDelay milliseconds
         while(running) {
             try {
@@ -165,7 +168,7 @@ public class PrintSpooler implements Runnable {
             return false;
         }
         
-        //currentJob.setPrinter = currentPrinter;
+        currentJob.setPrinter(currentPrinter);
         currentJob.prepareJob();
         currentJob = null;
         return true;
@@ -173,7 +176,6 @@ public class PrintSpooler implements Runnable {
     
     public void printToFile(String filePath) {
         if(currentJob != null) {
-            //currentJob.setPrinter = filePrinter;
             
             filePrinter.setOutputPath(filePath);
             currentJob.setPrinter(filePrinter);
