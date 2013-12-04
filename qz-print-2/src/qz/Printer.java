@@ -38,7 +38,6 @@ public interface Printer {
     // getName should return a String representation of the Printer's name
     public abstract String getName();
     
-    // Print is implmemented from the Printable interface.
     // This function does the heavy lifting of actually pushing data to 
     // the printer.
     public abstract void print(ByteArrayBuilder data) throws PrinterException;

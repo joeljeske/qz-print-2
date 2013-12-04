@@ -25,6 +25,10 @@ package qz;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.PrinterName;
 
 /**
  * The PrintSpooler will maintain a list of all print jobs and their status.
@@ -44,6 +48,8 @@ public class PrintSpooler implements Runnable {
     private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
     private Printer currentPrinter;
+    private ArrayList<Printer> printerList;
+    private String printerListString;
     private FilePrinter filePrinter;
     
     public void PrintSpooler() {
@@ -56,9 +62,15 @@ public class PrintSpooler implements Runnable {
         
         LogIt.log("PrintSpooler started");
         
+        // Get the list of all installed printers
+        printerList = new ArrayList<Printer>();
+        printerListString = "";
+        findAllPrinters();
+        
         // Initialize system variables
         running = true;
         filePrinter = new FilePrinter();
+        
         // Configurable variables
         loopDelay = 1000;
     
@@ -198,6 +210,30 @@ public class PrintSpooler implements Runnable {
     public String getJobInfo(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
         return job.getInfo();
+    }
+
+    public void findAllPrinters() {
+        
+        PrintService[] psList;
+        
+        psList = PrintServiceLookup.lookupPrintServices(null, null);
+        for (PrintService ps : psList) {
+            PrintServiceAttributeSet psa = ps.getAttributes();
+            
+            if(printerListString != "") {
+                printerListString += ",";
+            }
+            printerListString += psa.get(PrinterName.class);
+            
+            DebugPrinter printer = new DebugPrinter();
+            printer.setPrintService(ps);
+            printerList.add(printer);
+        }
+        
+    }
+    
+    public String getPrinters() {
+        return printerListString;
     }
     
 }

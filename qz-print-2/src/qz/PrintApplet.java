@@ -135,11 +135,23 @@ public class PrintApplet extends Applet {
     }
     public void findPrinter(String printerName) {
         //spooler.setPrinter(printerName);
-        btools.notifyBrowser("qzDoneFinding");
+        //btools.notifyBrowser("qzDoneFinding");
     }
     public String getPrinter() {
         //return spooler.getPrinter();
         return "";
+    }
+    public String getPrinters() {
+        
+        try {
+            String printerListString = spooler.getPrinters();
+            return printerListString;
+        }
+        catch(NullPointerException ex) {
+            LogIt.log(ex);
+            return "";
+        }
+        
     }
     public void setPrinter(int printerIndex) {
         //spooler.setPrinter(printerIndex);
