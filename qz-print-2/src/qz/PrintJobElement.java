@@ -41,7 +41,7 @@ import qz.exception.NullCommandException;
  */
 public class PrintJobElement {
     
-    public Integer sequence;
+    public int sequence;
     public boolean prepared;
     public String type;
     public PrintJob pj;
@@ -54,7 +54,7 @@ public class PrintJobElement {
     private LanguageType lang;
     private String xmlTag;
     
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer dotDensity) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int dotDensity) {
         
         this.lang = LanguageType.getType(lang);
         this.dotDensity = dotDensity;
@@ -68,7 +68,7 @@ public class PrintJobElement {
         
     }
 
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, Integer imageX, Integer imageY) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int imageX, int imageY) {
         
         this.lang = LanguageType.getType(lang);
         this.imageX = imageX;

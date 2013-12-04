@@ -44,7 +44,7 @@ public class PrintJob implements Runnable {
     private String title = "Print Job";
     private ArrayList<PrintJobElement> data = new ArrayList<PrintJobElement>();;
     private Boolean running = true;
-    private Integer updateDelay = 100;
+    private int updateDelay = 100;
     private Printer printer;
     
     public void run() {
@@ -81,7 +81,7 @@ public class PrintJob implements Runnable {
         }
     }
     
-    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer imageX, Integer imageY) {
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
         
         try {
             PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, imageX, imageY);
@@ -91,7 +91,7 @@ public class PrintJob implements Runnable {
             LogIt.log(e);
         }
     }
-    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer dotDensity) {
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int dotDensity) {
         
         try {
             PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, dotDensity);

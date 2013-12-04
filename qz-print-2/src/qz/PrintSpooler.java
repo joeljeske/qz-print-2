@@ -36,7 +36,7 @@ import java.util.ListIterator;
 public class PrintSpooler implements Runnable {
     
     public boolean running;
-    public Integer loopDelay;
+    public int loopDelay;
     public PrintJob currentJob;
     public Thread currentJobThread;
     
@@ -76,7 +76,7 @@ public class PrintSpooler implements Runnable {
                     
                     while(spoolIterator.hasNext()) {
 
-                        Integer jobIndex = spoolIterator.nextIndex();
+                        int jobIndex = spoolIterator.nextIndex();
                         PrintJob job = spoolIterator.next();
                         PrintJobState jobState = job.getJobState();
 
@@ -131,7 +131,7 @@ public class PrintSpooler implements Runnable {
     /**
      * Creates an image PrintJobElement and adds it to the current print job
      */
-    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer imageX, Integer imageY) {
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
         if(currentJob == null) {
             createJob();
         }
@@ -139,7 +139,7 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, imageX, imageY);
     }
 
-    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, Integer dotDensity) {
+    public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int dotDensity) {
         if(currentJob == null) {
             createJob();
         }
@@ -185,7 +185,7 @@ public class PrintSpooler implements Runnable {
         }
     }
     
-    public void cancelJob(Integer jobIndex) {
+    public void cancelJob(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
         job.cancel();
         spool.set(jobIndex, job);
@@ -195,7 +195,7 @@ public class PrintSpooler implements Runnable {
        return queueInfo;
     }
     
-    public String getJobInfo(Integer jobIndex) {
+    public String getJobInfo(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
         return job.getInfo();
     }

@@ -70,7 +70,7 @@ public class PrintApplet extends Applet {
     
     /* Testing Functions */
     
-    public void cancelJob(Integer jobIndex) {
+    public void cancelJob(int jobIndex) {
         spooler.cancelJob(jobIndex);
     }
     
@@ -78,7 +78,7 @@ public class PrintApplet extends Applet {
         return spooler.getQueueInfo();
     }
     
-    public String getJobInfo(Integer jobIndex) {
+    public String getJobInfo(int jobIndex) {
         return spooler.getJobInfo(jobIndex);
     }
     
@@ -129,6 +129,27 @@ public class PrintApplet extends Applet {
 
     
     // Javascript functions for spooler actions
+    
+    public void findPrinter() {
+        findPrinter(null);
+    }
+    public void findPrinter(String printerName) {
+        //spooler.setPrinter(printerName);
+        btools.notifyBrowser("qzDoneFinding");
+    }
+    public String getPrinter() {
+        //return spooler.getPrinter();
+        return "";
+    }
+    public void setPrinter(int printerIndex) {
+        //spooler.setPrinter(printerIndex);
+    }
+    
+    // Backwards compatability function. Finding printers is done instantly now,
+    // so it's always "done finding"
+    public boolean isDoneFinding() {
+        return true;
+    }
     
     /**
      * Appends String <var>data</var> to the spool after converting to a byte 
@@ -192,7 +213,7 @@ public class PrintApplet extends Applet {
         spooler.appendImage(bytes, charset, lang, 0, 0);
     }
     
-    public void appendImage(String imagePath, String lang, Integer imageX, Integer imageY) {
+    public void appendImage(String imagePath, String lang, int imageX, int imageY) {
         
         ByteArrayBuilder bytes = new ByteArrayBuilder();
         try {
@@ -205,7 +226,7 @@ public class PrintApplet extends Applet {
     
     public void appendImage(String imagePath, String lang, String dotDensityString) {
         
-        Integer dotDensity = 32;
+        int dotDensity = 32;
         
         if (dotDensityString.equalsIgnoreCase("single")) {
             dotDensity = 32;
@@ -221,7 +242,7 @@ public class PrintApplet extends Applet {
         appendImage(imagePath, lang, dotDensity);
     }
     
-    public void appendImage(String imagePath, String lang, Integer dotDensity) {
+    public void appendImage(String imagePath, String lang, int dotDensity) {
         ByteArrayBuilder bytes = new ByteArrayBuilder();
         try {
             bytes.append(imagePath, charset);
