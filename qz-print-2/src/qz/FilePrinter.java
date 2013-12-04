@@ -23,13 +23,10 @@ package qz;
 
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.print.PrintService;
 
 /**
@@ -39,7 +36,7 @@ import javax.print.PrintService;
  */
 public class FilePrinter implements Printer {
     
-    private final String name = "File Printer";
+    private String name = "File Printer";
     private String outputPath;
     
     FilePrinter() {
@@ -87,6 +84,14 @@ public class FilePrinter implements Printer {
     // Empty function. FilePrinter's should never have a ps set
     public void setPrintService(PrintService ps) {
         
+    }
+
+    public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
     
 }

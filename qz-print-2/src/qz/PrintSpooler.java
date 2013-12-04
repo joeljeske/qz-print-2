@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
+import javax.print.attribute.Attribute;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
 
@@ -75,7 +76,8 @@ public class PrintSpooler implements Runnable {
         loopDelay = 1000;
     
         // Default Printer
-        currentPrinter = new DebugPrinter();
+        //currentPrinter = new DebugPrinter();
+        currentPrinter = null;
         
         // Main loop - run every loopDelay milliseconds
         while(running) {
@@ -223,10 +225,12 @@ public class PrintSpooler implements Runnable {
             if(printerListString != "") {
                 printerListString += ",";
             }
-            printerListString += psa.get(PrinterName.class);
+            String printerName = psa.get(PrinterName.class).toString();
+            printerListString += printerName;
             
             DebugPrinter printer = new DebugPrinter();
             printer.setPrintService(ps);
+            printer.setName(printerName);
             printerList.add(printer);
         }
         
@@ -234,6 +238,33 @@ public class PrintSpooler implements Runnable {
     
     public String getPrinters() {
         return printerListString;
+    }
+
+    void findPrinter(String printerName) {
+        ListIterator<Printer> iterator = printerList.listIterator();
+        int index;
+        
+        while(iterator.hasNext()) {
+            
+            Printer printer = iterator.next();
+            if(printer.getName().equals(printerName)) {
+                currentPrinter = printer;
+                break;
+            }
+        }
+    }
+
+    void setPrinter(int printerIndex) {
+        currentPrinter = printerList.get(printerIndex);
+    }
+
+    String getPrinter() {
+        if(currentPrinter != null) {
+            return currentPrinter.getName();
+        }
+        else {
+            return null;
+        }
     }
     
 }

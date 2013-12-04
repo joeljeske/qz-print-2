@@ -38,9 +38,11 @@ public interface Printer {
     // getName should return a String representation of the Printer's name
     public abstract String getName();
     
-    // This function does the heavy lifting of actually pushing data to 
-    // the printer.
+    // This function sends raw data to a Raw type printer
     public abstract void printRaw(ByteArrayBuilder data) throws PrinterException;
+    
+    // This functions sends graphics data to a PostScript printer
+    public abstract void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException;
     
     /**
      * Returns a boolean value based on whether the printer is ready to accept 
@@ -69,4 +71,11 @@ public interface Printer {
      * @return The printer type
      */
     public abstract String getType();
+    
+    /**
+     * Sets the name variable of the printer
+     * 
+     * @param name 
+     */
+    public abstract void setName(String name);
 }

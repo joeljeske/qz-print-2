@@ -133,14 +133,16 @@ public class PrintApplet extends Applet {
     public void findPrinter() {
         findPrinter(null);
     }
+    
     public void findPrinter(String printerName) {
-        //spooler.setPrinter(printerName);
-        //btools.notifyBrowser("qzDoneFinding");
+        spooler.findPrinter(printerName);
+        btools.notifyBrowser("qzDoneFinding");
     }
+    
     public String getPrinter() {
-        //return spooler.getPrinter();
-        return "";
+        return spooler.getPrinter();
     }
+    
     public String getPrinters() {
         
         try {
@@ -154,7 +156,7 @@ public class PrintApplet extends Applet {
         
     }
     public void setPrinter(int printerIndex) {
-        //spooler.setPrinter(printerIndex);
+        spooler.setPrinter(printerIndex);
     }
     
     // Backwards compatability function. Finding printers is done instantly now,
