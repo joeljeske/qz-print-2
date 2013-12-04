@@ -21,39 +21,15 @@
  */
 package qz;
 
-import java.awt.print.PrinterException;
-import javax.print.PrintService;
-
 /**
- *
- * @author Owner
+ * PrintJobType is an enum class for storing the type of PrintJob. This variable
+ * is used to determine how to process the job and make sure it's going to the
+ * right kind of printer;
+ * 
+ * @author Thomas Hart II
  */
-public class DebugPrinter implements Printer {
-
-    private PrintService ps;
-            
-    public String getName() {
-        return "Debug Printer";
-    }
-
-    public void printRaw(ByteArrayBuilder data) throws PrinterException {
-        LogIt.log("DebugPrinter printing:\n" + new String(data.getByteArray()));
-    }
-
-    public boolean ready() {
-        return true;
-    }
-
-    public void setPrintService(PrintService ps) {
-        this.ps = ps;
-    }
-    
-    public PrintService getPrintService() {
-        return ps;
-    }
-
-    public String getType() {
-        return "DEBUG";
-    }
-    
+public enum PrintJobType {
+    TYPE_RAW,
+    TYPE_PS,
+    TYPE_HTML
 }

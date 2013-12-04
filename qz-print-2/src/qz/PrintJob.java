@@ -21,6 +21,9 @@
  */
 package qz;
 
+import java.awt.Graphics;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.IOException;
@@ -28,8 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.print.PrintService;
 
 /**
@@ -38,14 +39,18 @@ import javax.print.PrintService;
  * 
  * @author Thomas Hart
  */
-public class PrintJob implements Runnable {
+public class PrintJob implements Runnable, Printable {
     
     private PrintJobState state = PrintJobState.STATE_CREATED;
     private String title = "Print Job";
-    private ArrayList<PrintJobElement> data = new ArrayList<PrintJobElement>();;
+    private ArrayList<PrintJobElement> rawData = new ArrayList<PrintJobElement>();;
     private Boolean running = true;
     private int updateDelay = 100;
     private Printer printer;
+    private PrintJobType type;
+    private Graphics graphics;
+    private PageFormat pageFormat;
+    private int pageIndex;
     
     public void run() {
         while(running) {
@@ -72,9 +77,10 @@ public class PrintJob implements Runnable {
     }
     
     public void append(ByteArrayBuilder appendData, Charset charset) {
+        type = PrintJobType.TYPE_RAW;
         try {
             PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", charset);
-            data.add(pje);
+            rawData.add(pje);
         }
         catch(NullPointerException e) {
             LogIt.log(e);
@@ -82,20 +88,20 @@ public class PrintJob implements Runnable {
     }
     
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
-        
+        type = PrintJobType.TYPE_RAW;
         try {
             PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, imageX, imageY);
-            data.add(pje);
+            rawData.add(pje);
         }
         catch(NullPointerException e) {
             LogIt.log(e);
         }
     }
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int dotDensity) {
-        
+        type = PrintJobType.TYPE_RAW;
         try {
             PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, dotDensity);
-            data.add(pje);
+            rawData.add(pje);
         }
         catch(NullPointerException e) {
             LogIt.log(e);
@@ -104,29 +110,35 @@ public class PrintJob implements Runnable {
 
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         PrintJobElement pje = new PrintJobElement(this, url, "XML", charset, xmlTag);
-        data.add(pje);
+        rawData.add(pje);
     }
     
     public void appendFile(ByteArrayBuilder url, Charset charset) {
         PrintJobElement pje = new PrintJobElement(this, url, "FILE", charset);
-        data.add(pje);
+        rawData.add(pje);
     }
     
     public void prepareJob() {
         
         state = PrintJobState.STATE_PROCESSING;
         
-        ListIterator dataIterator = data.listIterator();
-        
-        while(dataIterator.hasNext()) {
-            try {
-                PrintJobElement pje = (PrintJobElement) dataIterator.next();
-                pje.prepare();
-            } catch (IOException ex) {
-                LogIt.log(ex);
+        if(type == PrintJobType.TYPE_RAW) {
+            
+            ListIterator dataIterator = rawData.listIterator();
+
+            while(dataIterator.hasNext()) {
+                try {
+                    PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                    pje.prepare();
+                } catch (IOException ex) {
+                    LogIt.log(ex);
+                }
             }
         }
-
+        else {
+            LogIt.log("Error: Unsupported job type.");
+        }
+        
         state = PrintJobState.STATE_PROCESSED;
         
     }
@@ -141,18 +153,23 @@ public class PrintJob implements Runnable {
         
         String jobInfo = "";
         
-        ListIterator dataIterator = data.listIterator();
-        
-        while(dataIterator.hasNext()) {
-            PrintJobElement pje = (PrintJobElement) dataIterator.next();
-            ByteArrayBuilder bytes = pje.getData();
-            String info;
-            try {
-                info = new String(bytes.getByteArray(), pje.getCharset().name());
-                jobInfo += info;
-            } catch (UnsupportedEncodingException ex) {
-                LogIt.log(ex);
+        if(type == PrintJobType.TYPE_RAW) {
+            ListIterator dataIterator = rawData.listIterator();
+
+            while(dataIterator.hasNext()) {
+                PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                ByteArrayBuilder bytes = pje.getData();
+                String info;
+                try {
+                    info = new String(bytes.getByteArray(), pje.getCharset().name());
+                    jobInfo += info;
+                } catch (UnsupportedEncodingException ex) {
+                    LogIt.log(ex);
+                }
             }
+        }
+        else {
+            LogIt.log("Error: Unsupported job type.");
         }
         
         return jobInfo;
@@ -163,50 +180,52 @@ public class PrintJob implements Runnable {
     public void print() {
         state = PrintJobState.STATE_SENDING;
         
-        ByteArrayBuilder jobData = new ByteArrayBuilder();
-        
-        // Concatenate all the PrintJobElements into one ByteArrayBuilder
-        ListIterator dataIterator = data.listIterator();
-        
-        while(dataIterator.hasNext()) {
-            PrintJobElement pje = (PrintJobElement) dataIterator.next();
-            ByteArrayBuilder bytes = pje.getData();
-            jobData.append(bytes.getByteArray());
-        }
-        
-        
-        
-        if(printer.getType().equals("FILE")) {
+        if(type == PrintJobType.TYPE_RAW) {
+            ByteArrayBuilder jobData = new ByteArrayBuilder();
+
+            // Concatenate all the PrintJobElements into one ByteArrayBuilder
+            ListIterator dataIterator = rawData.listIterator();
+
+            while(dataIterator.hasNext()) {
+                PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                ByteArrayBuilder bytes = pje.getData();
+                jobData.append(bytes.getByteArray());
+            }
+            
             try {
-                printer.print(jobData);
+                printer.printRaw(jobData);
             }
             catch(PrinterException ex) {
                 LogIt.log(ex);
             }
         }
-        else if(printer.getType().equals("DEBUG")) {
-            try {
-                printer.print(jobData);
-            }
-            catch(PrinterException ex) {
-                LogIt.log(ex);
-            }
-        }
-        else {
+        else if(type == PrintJobType.TYPE_PS) {
             PrintService ps = printer.getPrintService();
             PrinterJob pj = PrinterJob.getPrinterJob();
             try {
                 pj.setPrintService(ps);
+                pj.setPrintable(this);
+                pj.setJobName(title);
+                pj.print();
+                //j.setVisible(false);
             } catch (PrinterException ex) {
                 LogIt.log(ex);
             }
-            
-            // TODO: Finish implementing this function for print jobs that aren't "to file"
         }
-        
+        else {
+            LogIt.log("Error: Unsupported job type.");
+        }
+            
         state = PrintJobState.STATE_COMPLETE;
+
     }
     
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        //this.type = PrintJobType.TYPE_PS;
+        //print();
+        return PAGE_EXISTS;
+    }
+
     public void setPrinter(Printer printer) {
         this.printer = printer;
     }

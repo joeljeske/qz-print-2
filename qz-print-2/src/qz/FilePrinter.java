@@ -69,7 +69,7 @@ public class FilePrinter implements Printer {
         return "FILE";
     }
 
-    public void print(ByteArrayBuilder data) throws PrinterException {
+    public void printRaw(ByteArrayBuilder data) throws PrinterException {
         LogIt.log("Printing to file: " + outputPath);
         
         try {

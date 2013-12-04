@@ -40,7 +40,7 @@ public interface Printer {
     
     // This function does the heavy lifting of actually pushing data to 
     // the printer.
-    public abstract void print(ByteArrayBuilder data) throws PrinterException;
+    public abstract void printRaw(ByteArrayBuilder data) throws PrinterException;
     
     /**
      * Returns a boolean value based on whether the printer is ready to accept 
