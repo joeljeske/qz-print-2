@@ -53,6 +53,7 @@ public class PrintJobElement {
     private int dotDensity = 32;
     private LanguageType lang;
     private String xmlTag;
+    private BufferedImage bufferedImage;
     
     PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int dotDensity) {
         
@@ -105,6 +106,16 @@ public class PrintJobElement {
         prepared = false;
     }
     
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type) {
+        
+        this.pj = pj;
+        this.data = data;
+        this.type = type;
+        this.charset = Charset.defaultCharset();
+        
+        prepared = false;
+    }
+    
     public boolean prepare() throws IOException {
 
         //TODO: Add prepare code for all types
@@ -148,6 +159,10 @@ public class PrintJobElement {
                 LogIt.log(ex);
             }
         }
+        else if(type.equals("IMAGE_PS")) {
+            String file = new String(data.getByteArray(), charset.name());
+            bufferedImage = ImageIO.read(new URL(file));
+        }
         else if(type.equals("XML")) {
             String file = new String(data.getByteArray(), charset.name());
             String dataString;
@@ -182,6 +197,10 @@ public class PrintJobElement {
     
     public ByteArrayBuilder getData() {
         return data;
+    }
+    
+    public BufferedImage getBufferedImage() {
+        return bufferedImage;
     }
     
     public Charset getCharset() {
