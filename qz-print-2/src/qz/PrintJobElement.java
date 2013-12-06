@@ -32,6 +32,7 @@ import static java.awt.print.Printable.PAGE_EXISTS;
 import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -165,7 +166,13 @@ public class PrintJobElement {
         }
         else if(type.equals("IMAGE_PS")) {
             String file = new String(data.getByteArray(), charset.name());
-            bufferedImage = ImageIO.read(new URL(file));
+            if (ByteUtilities.isBase64Image(file)) {
+                byte[] imgData = Base64.decode(file.split(",")[1]);
+                InputStream in = new ByteArrayInputStream(imgData);
+                bufferedImage = ImageIO.read(in);
+            } else {
+                bufferedImage = ImageIO.read(new URL(file));
+            }
         }
         else if(type.equals("XML")) {
             String file = new String(data.getByteArray(), charset.name());
