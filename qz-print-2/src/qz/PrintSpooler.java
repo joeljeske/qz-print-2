@@ -25,9 +25,9 @@ package qz;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.print.attribute.Attribute;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
 
@@ -75,8 +75,7 @@ public class PrintSpooler implements Runnable {
         // Configurable variables
         loopDelay = 1000;
     
-        // Default Printer
-        //currentPrinter = new DebugPrinter();
+        // TODO: Get Default Printer
         currentPrinter = null;
         
         // Main loop - run every loopDelay milliseconds
@@ -161,6 +160,14 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
     
+    public void appendPSImage(String url) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendPSImage(url);
+    }
+    
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         if(currentJob == null) {
             createJob();
@@ -228,7 +235,15 @@ public class PrintSpooler implements Runnable {
             String printerName = psa.get(PrinterName.class).toString();
             printerListString += printerName;
             
-            DebugPrinter printer = new DebugPrinter();
+            Printer printer;
+            
+            if(ps.isDocFlavorSupported(DocFlavor.INPUT_STREAM.POSTSCRIPT)) {
+                printer = (PSPrinter)new PSPrinter();
+            }
+            else {
+                printer = (RawPrinter)new RawPrinter();
+            }
+            
             printer.setPrintService(ps);
             printer.setName(printerName);
             printerList.add(printer);
@@ -242,7 +257,6 @@ public class PrintSpooler implements Runnable {
 
     void findPrinter(String printerName) {
         ListIterator<Printer> iterator = printerList.listIterator();
-        int index;
         
         while(iterator.hasNext()) {
             
