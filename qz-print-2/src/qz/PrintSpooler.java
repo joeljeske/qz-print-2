@@ -52,6 +52,8 @@ public class PrintSpooler implements Runnable {
     private ArrayList<Printer> printerList;
     private String printerListString;
     private FilePrinter filePrinter;
+    private PaperFormat paperSize;
+    private boolean autoSize;
     
     public void PrintSpooler() {
         
@@ -131,6 +133,14 @@ public class PrintSpooler implements Runnable {
         currentJob = new PrintJob();
         currentJobThread = new Thread(currentJob);
         currentJobThread.start();
+        
+        if(paperSize != null) {
+            currentJob.setPaperSize(paperSize);
+        }
+        if(autoSize) {
+            currentJob.setAutoSize(true);
+        }
+        
         spool.add(currentJob);
     }
     
@@ -279,6 +289,15 @@ public class PrintSpooler implements Runnable {
         else {
             return null;
         }
+    }
+
+    void setPaperSize(PaperFormat paperSize) {
+        this.paperSize = paperSize;
+        
+    }
+
+    void setAutoSize(boolean autoSize) {
+        this.autoSize = autoSize;
     }
     
 }

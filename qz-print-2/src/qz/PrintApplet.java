@@ -46,6 +46,7 @@ public class PrintApplet extends Applet {
     private PrintSpooler spooler;
     private Exception currentException;
     private Charset charset;
+    private PaperFormat paperSize;
     
     @Override
     public void start() {
@@ -94,6 +95,7 @@ public class PrintApplet extends Applet {
         appendImage
         appendHex
         appendXML
+        appendPDF
         print
         setAutoSize
         setOrientation
@@ -271,12 +273,6 @@ public class PrintApplet extends Applet {
         spooler.appendPSImage(url);
     }
     
-    // Stub function
-    // TODO: Implement appendImageUrl
-    public void appendImageUrl(String url) {
-        
-    }
-    
     /**
      * Gets the first XML node identified by <code>tagName</code>, reads its
      * contents and appends it to the buffer. Assumes XML content is base64
@@ -355,6 +351,34 @@ public class PrintApplet extends Applet {
             LogIt.log(Level.WARNING, "Could not find specified charset encoding: "
                     + charset + ". Using default.", e);
         }
+    }
+    
+    public void setPaperSize(String width, String height) {
+        this.paperSize = PaperFormat.parseSize(width, height);
+        spooler.setPaperSize(paperSize);
+        LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
+                + paperSize.getUnitDescription() + "x"
+                + paperSize.getHeight() + paperSize.getUnitDescription());
+    }
+
+    public void setPaperSize(float width, float height) {
+        this.paperSize = new PaperFormat(width, height);
+        spooler.setPaperSize(paperSize);
+        LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
+                + paperSize.getUnitDescription() + "x"
+                + paperSize.getHeight() + paperSize.getUnitDescription());
+    }
+
+    public void setPaperSize(float width, float height, String units) {
+        this.paperSize = PaperFormat.parseSize("" + width, "" + height, units);
+        spooler.setPaperSize(paperSize);
+        LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
+                + paperSize.getUnitDescription() + "x"
+                + paperSize.getHeight() + paperSize.getUnitDescription());
+    }
+    
+    public void setAutoSize(boolean autoSize) {
+        spooler.setAutoSize(autoSize);
     }
     
     // Deprecated functions

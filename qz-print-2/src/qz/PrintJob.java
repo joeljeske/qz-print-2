@@ -58,8 +58,14 @@ public class PrintJob implements Runnable, Printable {
     private Graphics graphics;
     private PageFormat pageFormat;
     private int pageIndex;
+    private PaperFormat paperSize;
     
+    private boolean autoSize;
+
     public void run() {
+        
+        this.autoSize = false;
+        
         while(running) {
             try {
                 Thread.sleep(updateDelay);
@@ -217,9 +223,39 @@ public class PrintJob implements Runnable, Printable {
             // PostScript jobs only support a single PrintJobElement
             // This should be either an image (type IMAGE_PS) or pdf
             try {
+                
+                PrintJobElement firstElement = rawData.get(0);
                 PrinterJob job = PrinterJob.getPrinterJob();
                 
+                int w;
+                int h;
+
+                if (firstElement.getBufferedImage() != null) {
+                    w = firstElement.getBufferedImage().getWidth();
+                    h = firstElement.getBufferedImage().getHeight();
+                } 
+                /* else if (firstElement.getPDFFile() != null) {
+                    w = ((Float)getPDFFile().call("getPage", 1).call("getWidth").get()).intValue();
+                    h = ((Float)getPDFFile().call("getPage", 1).call("getHeight").get()).intValue();
+                } */
+                else {
+                    throw new PrinterException("Corrupt or missing file supplied.");
+                }
+                
                 HashPrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                
+                if (paperSize != null) {
+                    attr.add(paperSize.getOrientationRequested());
+                    if (paperSize.isAutoSize()) {
+                        if(rawData.get(0).type == "IMAGE_PS") {
+                            paperSize.setAutoSize(rawData.get(0).getBufferedImage());
+                        }
+                    }
+                    attr.add(new MediaPrintableArea(0f, 0f, paperSize.getAutoWidth(), paperSize.getAutoHeight(), paperSize.getUnits()));
+
+                } else {
+                    attr.add(new MediaPrintableArea(0f, 0f, w / 72f, h / 72f, MediaSize.INCH));
+                }
                 
                 job.setPrintService(printer.getPrintService());
                 job.setPrintable(this);
@@ -280,6 +316,14 @@ public class PrintJob implements Runnable, Printable {
         }
         
         return NO_SUCH_PAGE;
+    }
+    
+    void setPaperSize(PaperFormat paperSize) {
+        this.paperSize = paperSize;
+    }
+
+    void setAutoSize(boolean autoSize) {
+        this.autoSize = autoSize;
     }
 
 }
