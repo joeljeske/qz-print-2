@@ -270,7 +270,13 @@ public class PrintApplet extends Applet {
     
     public void appendImage(String url) {
         // if appendImage is called without a lang, it's a postscript job
-        spooler.appendPSImage(url);
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        try {
+            bytes.append(url, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendPSImage(bytes, charset);
     }
     
     /**
@@ -306,6 +312,17 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendFile(bytes, charset);
+    }
+    
+    public void appendPDF(String url) {
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+            
+        try {
+            bytes.append(url, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendPDF(bytes, charset);
     }
     
     public boolean print() {

@@ -170,12 +170,12 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
     
-    public void appendPSImage(String url) {
+    public void appendPSImage(ByteArrayBuilder url, Charset charset) {
         if(currentJob == null) {
             createJob();
         }
         
-        currentJob.appendPSImage(url);
+        currentJob.appendPSImage(url, charset);
     }
     
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
@@ -192,6 +192,14 @@ public class PrintSpooler implements Runnable {
         }
         
         currentJob.appendFile(url, charset);
+    }
+    
+    public void appendPDF(ByteArrayBuilder url, Charset charset) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendPDF(url, charset);
     }
     
     public boolean print() {

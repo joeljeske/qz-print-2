@@ -27,6 +27,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
+import static java.awt.print.Printable.NO_SUCH_PAGE;
 import static java.awt.print.Printable.PAGE_EXISTS;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -36,7 +37,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
 import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSize;
 
@@ -121,20 +121,27 @@ public class PrintJob implements Runnable, Printable {
         }
     }
     
-    public void appendPSImage(String url) {
+    public void appendPSImage(ByteArrayBuilder url, Charset charset) {
         type = PrintJobType.TYPE_PS;
-        ByteArrayBuilder data = new ByteArrayBuilder(url.getBytes());
-        PrintJobElement pje = new PrintJobElement(this, data, "IMAGE_PS");
+        PrintJobElement pje = new PrintJobElement(this, url, "IMAGE_PS", charset);
         rawData.add(pje);
     }
 
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
+        type = PrintJobType.TYPE_RAW;
         PrintJobElement pje = new PrintJobElement(this, url, "XML", charset, xmlTag);
         rawData.add(pje);
     }
     
     public void appendFile(ByteArrayBuilder url, Charset charset) {
+        type = PrintJobType.TYPE_RAW;
         PrintJobElement pje = new PrintJobElement(this, url, "FILE", charset);
+        rawData.add(pje);
+    }
+    
+    public void appendPDF(ByteArrayBuilder url, Charset charset) {
+        type = PrintJobType.TYPE_PS;
+        PrintJobElement pje = new PrintJobElement(this, url, "PDF", charset);
         rawData.add(pje);
     }
     
@@ -142,21 +149,15 @@ public class PrintJob implements Runnable, Printable {
         
         state = PrintJobState.STATE_PROCESSING;
         
-        if(type == PrintJobType.TYPE_RAW || type == PrintJobType.TYPE_PS) {
-            
-            ListIterator dataIterator = rawData.listIterator();
+        ListIterator dataIterator = rawData.listIterator();
 
-            while(dataIterator.hasNext()) {
-                try {
-                    PrintJobElement pje = (PrintJobElement) dataIterator.next();
-                    pje.prepare();
-                } catch (IOException ex) {
-                    LogIt.log(ex);
-                }
+        while(dataIterator.hasNext()) {
+            try {
+                PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                pje.prepare();
+            } catch (IOException ex) {
+                LogIt.log(ex);
             }
-        }
-        else {
-            LogIt.log("Error: Unsupported job type.");
         }
         
         state = PrintJobState.STATE_PROCESSED;
@@ -234,10 +235,10 @@ public class PrintJob implements Runnable, Printable {
                     w = firstElement.getBufferedImage().getWidth();
                     h = firstElement.getBufferedImage().getHeight();
                 } 
-                /* else if (firstElement.getPDFFile() != null) {
-                    w = ((Float)getPDFFile().call("getPage", 1).call("getWidth").get()).intValue();
-                    h = ((Float)getPDFFile().call("getPage", 1).call("getHeight").get()).intValue();
-                } */
+                else if (firstElement.getPDFFile() != null) {
+                    w = ((Float)firstElement.getPDFFile().call("getPage", 1).call("getWidth").get()).intValue();
+                    h = ((Float)firstElement.getPDFFile().call("getPage", 1).call("getHeight").get()).intValue();
+                }
                 else {
                     throw new PrinterException("Corrupt or missing file supplied.");
                 }
@@ -264,7 +265,9 @@ public class PrintJob implements Runnable, Printable {
 
             } catch (PrinterException ex) {
                 LogIt.log(ex);
-            }
+            } catch (IndexOutOfBoundsException ex) {
+                LogIt.log(ex);
+            }            
         }
         else {
             LogIt.log("Error: Unsupported job type.");
@@ -313,6 +316,9 @@ public class PrintJob implements Runnable, Printable {
                /* tell the caller that this page is part of the printed document */
                return PAGE_EXISTS;
             }
+            else if(pje.type == "PDF") {
+                return pje.printPDFRenderer(graphics, pageFormat, pageIndex);
+            }
         }
         
         return NO_SUCH_PAGE;
@@ -325,5 +331,5 @@ public class PrintJob implements Runnable, Printable {
     void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
     }
-
+    
 }

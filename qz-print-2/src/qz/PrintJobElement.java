@@ -21,18 +21,30 @@
  */
 package qz;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import static java.awt.print.Printable.NO_SUCH_PAGE;
+import static java.awt.print.Printable.PAGE_EXISTS;
+import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 import qz.exception.InvalidRawImageException;
 import qz.exception.NullCommandException;
+import qz.reflection.Reflect;
+import qz.reflection.ReflectException;
 
 /**
  * A PrintJobElement is a piece of a PrintJob that contains a data string,
@@ -54,6 +66,8 @@ public class PrintJobElement {
     private LanguageType lang;
     private String xmlTag;
     private BufferedImage bufferedImage;
+    private Reflect pdfFile;
+    private ByteBuffer bufferedPDF;
     
     PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int dotDensity) {
         
@@ -102,16 +116,6 @@ public class PrintJobElement {
         this.data = data;
         this.type = type;
         this.charset = charset;
-        
-        prepared = false;
-    }
-    
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type) {
-        
-        this.pj = pj;
-        this.data = data;
-        this.type = type;
-        this.charset = Charset.defaultCharset();
         
         prepared = false;
     }
@@ -186,6 +190,15 @@ public class PrintJobElement {
             String file = new String(data.getByteArray(), charset.name());
             data = new ByteArrayBuilder(FileUtilities.readRawFile(file));
         }
+        else if(type.equals("PDF")) {
+            String file = new String(data.getByteArray(), charset.name());
+            bufferedPDF = ByteBuffer.wrap(ByteUtilities.readBinaryFile(file));
+            try {
+                pdfFile = getPDFFile();
+            } catch (PrinterException ex) {
+                LogIt.log(ex);
+            }
+        }
 
         prepared = true;
         return true;
@@ -207,4 +220,56 @@ public class PrintJobElement {
         return charset;
     }
     
+    
+    public Reflect getPDFFile() throws PrinterException {
+        //pdfFile.set(Reflect.on("com.sun.pdfview.PDFFile").create());
+        
+        if (pdfFile == null && bufferedPDF != null) {
+            
+            try {
+                pdfFile = Reflect.on("com.sun.pdfview.PDFFile").create(this.bufferedPDF);
+            } catch (ReflectException ex) {
+                LogIt.log(ex);
+            }
+        }
+        return pdfFile;
+    }
+    
+    public int printPDFRenderer(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        /*
+         * Important:  This uses class reflection to instantiate and invoke
+         * PDFRenderer to reduce reliance on the project's classpath for 3rd 
+         * party libraries.
+         */
+        Reflect pdf = getPDFFile();
+        
+        int pg = pageIndex + 1;
+        
+        if (pdf == null) {
+        throw new PrinterException("No PDF data specified");
+        }
+        
+        if (pg < 1 || pg > (Integer)pdf.call("getNumPages").get()) {
+            return NO_SUCH_PAGE;
+        }
+        
+        // fit the PDFPage into the printing area
+        Graphics2D g2 = (Graphics2D) graphics;
+        Reflect page = pdf.call("getPage", pg);
+        
+        Rectangle2D pageBox = (Rectangle2D)page.call("getPageBox").get();
+        Rectangle2D bBox = (Rectangle2D)page.call("getBBox").get();
+        
+        Reflect pgs = Reflect.on("com.sun.pdfview.PDFRenderer").create(page.get(), g2, pageBox.getBounds(), bBox, Color.WHITE);
+        
+        try {
+            page.call("waitForFinish");
+            pgs.call("run");
+        } catch (ReflectException ex) {
+            LogIt.log(Level.WARNING, "Error rendering PDF", ex);
+        }
+        
+        return PAGE_EXISTS;
+        
+    }    
 }
