@@ -22,8 +22,12 @@
 package qz;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
+import static java.awt.print.Printable.PAGE_EXISTS;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.IOException;
@@ -31,7 +35,10 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import javax.print.PrintService;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.MediaSize;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -107,6 +114,13 @@ public class PrintJob implements Runnable, Printable {
             LogIt.log(e);
         }
     }
+    
+    public void appendPSImage(String url) {
+        type = PrintJobType.TYPE_PS;
+        ByteArrayBuilder data = new ByteArrayBuilder(url.getBytes());
+        PrintJobElement pje = new PrintJobElement(this, data, "IMAGE_PS");
+        rawData.add(pje);
+    }
 
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         PrintJobElement pje = new PrintJobElement(this, url, "XML", charset, xmlTag);
@@ -122,7 +136,7 @@ public class PrintJob implements Runnable, Printable {
         
         state = PrintJobState.STATE_PROCESSING;
         
-        if(type == PrintJobType.TYPE_RAW) {
+        if(type == PrintJobType.TYPE_RAW || type == PrintJobType.TYPE_PS) {
             
             ListIterator dataIterator = rawData.listIterator();
 
@@ -200,14 +214,18 @@ public class PrintJob implements Runnable, Printable {
             }
         }
         else if(type == PrintJobType.TYPE_PS) {
-            PrintService ps = printer.getPrintService();
-            PrinterJob pj = PrinterJob.getPrinterJob();
+            // PostScript jobs only support a single PrintJobElement
+            // This should be either an image (type IMAGE_PS) or pdf
             try {
-                pj.setPrintService(ps);
-                pj.setPrintable(this);
-                pj.setJobName(title);
-                pj.print();
-                //j.setVisible(false);
+                PrinterJob job = PrinterJob.getPrinterJob();
+                
+                HashPrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                
+                job.setPrintService(printer.getPrintService());
+                job.setPrintable(this);
+                job.setJobName(title);
+                job.print(attr);
+
             } catch (PrinterException ex) {
                 LogIt.log(ex);
             }
@@ -220,12 +238,6 @@ public class PrintJob implements Runnable, Printable {
 
     }
     
-    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        //this.type = PrintJobType.TYPE_PS;
-        //print();
-        return PAGE_EXISTS;
-    }
-
     public void setPrinter(Printer printer) {
         this.printer = printer;
     }
@@ -234,4 +246,40 @@ public class PrintJob implements Runnable, Printable {
         return printer;
     }
 
- }
+    
+    /**
+     * This function is not called directly. It's used by the Printable interface to render each page
+     * @param graphics
+     * @param pageFormat
+     * @param pageIndex
+     * @return
+     * @throws PrinterException 
+     */
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        if(pageIndex < rawData.size()) {
+            PrintJobElement pje = rawData.get(pageIndex);
+            if(pje.type == "IMAGE_PS") {
+                /* User (0,0) is typically outside the imageable area, so we must
+                * translate by the X and Y values in the PageFormat to avoid clipping
+                */
+               Graphics2D g2d = (Graphics2D) graphics;
+
+               // Sugested by Bahadir 8/23/2012
+               g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+               g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+               g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+               g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+               BufferedImage imgToPrint = pje.getBufferedImage();
+               /* Now we perform our rendering */
+               g2d.drawImage(imgToPrint, 0, 0, (int) pageFormat.getImageableWidth(), (int) pageFormat.getImageableHeight(), imgToPrint.getMinX(), imgToPrint.getMinY(), imgToPrint.getWidth(), imgToPrint.getHeight(), null);
+
+               /* tell the caller that this page is part of the printed document */
+               return PAGE_EXISTS;
+            }
+        }
+        
+        return NO_SUCH_PAGE;
+    }
+
+}

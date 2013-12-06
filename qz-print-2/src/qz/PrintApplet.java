@@ -266,10 +266,9 @@ public class PrintApplet extends Applet {
         spooler.appendImage(bytes, charset, lang, dotDensity);
     }
     
-    // Support old appendImage function for url
-    // This just calls appendImageUrl
     public void appendImage(String url) {
-        appendImageUrl(url);
+        // if appendImage is called without a lang, it's a postscript job
+        spooler.appendPSImage(url);
     }
     
     // Stub function
@@ -322,6 +321,12 @@ public class PrintApplet extends Applet {
             LogIt.log("Print Failed");
             return false;
         }
+    }
+    
+    // Stub function for backwards compatability
+    // PrintJob will determine if it's a raw or ps job when data is being added
+    public boolean printPS() {
+        return print();
     }
     
     public void printToFile(String filePath) {
