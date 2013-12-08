@@ -24,6 +24,9 @@ package qz;
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.Locale;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
@@ -116,12 +119,27 @@ public class RawPrinter implements Printer {
         LogIt.log("Print job received by printer: \"" + ps.getName() + "\"");
     }
 
+    public void printToHost(ByteArrayBuilder data, String jobHost, int jobPort) {
+        LogIt.log("Printing to host " + jobHost + ":" + jobPort);
+        
+        try {
+            Socket socket = new Socket(jobHost, jobPort);
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.write(data.getByteArray());
+            socket.close();
+        }
+        catch (IOException ex) {
+            LogIt.log(ex);
+        }
+        
+    }
+    
     public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
         // This function is not supported on Raw printers
     }
 
     public boolean ready() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
     public void setPrintService(PrintService ps) {

@@ -232,6 +232,16 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    public void printToHost(String jobHost, int jobPort) {
+        if(currentJob != null) {
+            
+            currentJob.setHostOutput(jobHost, jobPort);
+            currentJob.prepareJob();
+            currentJob = null;
+            
+        }
+    }
+    
     public void cancelJob(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
         job.cancel();

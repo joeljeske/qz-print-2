@@ -364,6 +364,10 @@ public class PrintApplet extends Applet {
         spooler.printToFile(filePath);
     }
     
+    public void printToHost(String jobHost, int jobPort) {
+        spooler.printToHost(jobHost, jobPort);
+    }
+    
     public String getVersion() {
         return VERSION;
     }

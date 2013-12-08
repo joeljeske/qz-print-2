@@ -71,6 +71,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     private PageFormat pageFormat;
     private int pageIndex;
     private PaperFormat paperSize;
+    private String jobHost;
+    private int jobPort;
     
     private boolean autoSize;
 
@@ -232,8 +234,14 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             }
             
             try {
-                printer.setJobTitle(title);
-                printer.printRaw(jobData);
+                RawPrinter rawPrinter = (RawPrinter)printer;
+                rawPrinter.setJobTitle(title);
+                if(jobHost != null) {
+                    rawPrinter.printToHost(jobData, jobHost, jobPort);
+                }
+                else {
+                    rawPrinter.printRaw(jobData);
+                }
             }
             catch(PrinterException ex) {
                 LogIt.log(ex);
@@ -406,6 +414,12 @@ public class PrintJob extends JLabel implements Runnable, Printable {
         }
         
         return NO_SUCH_PAGE;
+    }
+    
+    public void setHostOutput(String jobHost, int jobPort) {
+        this.jobHost = jobHost;
+        this.jobPort = jobPort;
+        this.printer = new RawPrinter();
     }
     
     void setPaperSize(PaperFormat paperSize) {
