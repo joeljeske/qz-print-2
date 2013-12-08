@@ -38,6 +38,7 @@ public class FilePrinter implements Printer {
     
     private String name = "File Printer";
     private String outputPath;
+    private String jobTitle;
     
     FilePrinter() {
         
@@ -92,6 +93,10 @@ public class FilePrinter implements Printer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
     
 }

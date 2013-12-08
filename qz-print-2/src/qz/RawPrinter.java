@@ -24,7 +24,17 @@ package qz;
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.util.Locale;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
 import javax.print.PrintService;
+import javax.print.SimpleDoc;
+import javax.print.attribute.DocAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
+import javax.print.event.PrintJobEvent;
+import javax.print.event.PrintJobListener;
 
 /**
  *
@@ -34,13 +44,76 @@ public class RawPrinter implements Printer {
 
     private String name;
     private PrintService ps;
+    private boolean isFinished;
+    private DocFlavor docFlavor;
+    private DocAttributeSet docAttr;
+    private PrintRequestAttributeSet reqAttr;
+    private String jobTitle;
     
     public String getName() {
         return name;
     }
 
     public void printRaw(ByteArrayBuilder data) throws PrinterException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        SimpleDoc doc = new SimpleDoc(data.getByteArray(), docFlavor, docAttr);
+        
+        reqAttr.add(new JobName(jobTitle, Locale.getDefault()));
+        DocPrintJob pj = ps.createPrintJob();
+        pj.addPrintJobListener(new PrintJobListener() {
+            //@Override //JDK 1.6
+            public void printDataTransferCompleted(PrintJobEvent pje) {
+                LogIt.log(pje);
+                isFinished = true;
+            }
+
+            //@Override //JDK 1.6
+            public void printJobCompleted(PrintJobEvent pje) {
+                LogIt.log(pje);
+                isFinished = true;
+            }
+
+            //@Override //JDK 1.6
+            public void printJobFailed(PrintJobEvent pje) {
+                LogIt.log(pje);
+                isFinished = true;
+            }
+
+            //@Override //JDK 1.6
+            public void printJobCanceled(PrintJobEvent pje) {
+                LogIt.log(pje);
+                isFinished = true;
+            }
+
+            //@Override //JDK 1.6
+            public void printJobNoMoreEvents(PrintJobEvent pje) {
+                LogIt.log(pje);
+                isFinished = true;
+            }
+
+            //@Override //JDK 1.6
+            public void printJobRequiresAttention(PrintJobEvent pje) {
+                LogIt.log(pje);
+            }
+        });
+
+        LogIt.log("Sending print job to printer: \"" + ps.getName() + "\"");
+        
+        try {
+            pj.print(doc, reqAttr);
+        } catch (PrintException ex) {
+            LogIt.log(ex);
+        }
+
+        while (!isFinished) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                LogIt.log(ex);
+            }
+        }
+
+        LogIt.log("Print job received by printer: \"" + ps.getName() + "\"");
     }
 
     public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
@@ -67,4 +140,7 @@ public class RawPrinter implements Printer {
         this.name = name;
     }
     
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
 }

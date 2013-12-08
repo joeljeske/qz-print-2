@@ -34,6 +34,7 @@ public class DebugPrinter implements Printer {
 
     private PrintService ps;
     private String name = "Debug Printer";
+    private String jobTitle;
     
     public String getName() {
         return name;
@@ -67,4 +68,7 @@ public class DebugPrinter implements Printer {
         this.name = name;
     }
     
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
 }

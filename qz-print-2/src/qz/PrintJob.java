@@ -232,6 +232,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             }
             
             try {
+                printer.setJobTitle(title);
                 printer.printRaw(jobData);
             }
             catch(PrinterException ex) {

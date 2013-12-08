@@ -36,6 +36,7 @@ public class PSPrinter implements Printer {
 
     private String name;
     private PrintService ps;
+    private String jobTitle;
     
     public String getName() {
         return name;
@@ -68,6 +69,10 @@ public class PSPrinter implements Printer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
     
 }
