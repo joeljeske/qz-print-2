@@ -24,6 +24,7 @@ package qz;
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.nio.charset.Charset;
 import javax.print.PrintService;
 import javax.print.attribute.standard.PrinterState;
 

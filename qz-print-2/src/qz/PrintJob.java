@@ -21,6 +21,7 @@
  */
 package qz;
 
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -36,9 +37,20 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.standard.JobName;
 import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSize;
+import javax.print.event.PrintJobEvent;
+import javax.print.event.PrintJobListener;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -46,7 +58,7 @@ import javax.print.attribute.standard.MediaSize;
  * 
  * @author Thomas Hart
  */
-public class PrintJob implements Runnable, Printable {
+public class PrintJob extends JLabel implements Runnable, Printable {
     
     private PrintJobState state = PrintJobState.STATE_CREATED;
     private String title = "Print Job";
@@ -139,6 +151,12 @@ public class PrintJob implements Runnable, Printable {
         rawData.add(pje);
     }
     
+    public void appendHTML(ByteArrayBuilder html, Charset charset) {
+        type = PrintJobType.TYPE_HTML;
+        PrintJobElement pje = new PrintJobElement(this, html, "HTML", charset);
+        rawData.add(pje);
+    }
+    
     public void appendPDF(ByteArrayBuilder url, Charset charset) {
         type = PrintJobType.TYPE_PS;
         PrintJobElement pje = new PrintJobElement(this, url, "PDF", charset);
@@ -220,9 +238,63 @@ public class PrintJob implements Runnable, Printable {
                 LogIt.log(ex);
             }
         }
+        else if(type == PrintJobType.TYPE_HTML) {
+            
+            ByteArrayBuilder jobData = new ByteArrayBuilder();
+
+            // Concatenate all the PrintJobElements into one ByteArrayBuilder
+            ListIterator dataIterator = rawData.listIterator();
+
+            Charset charset = null;
+            while(dataIterator.hasNext()) {
+                PrintJobElement pje = (PrintJobElement) dataIterator.next();
+                ByteArrayBuilder bytes = pje.getData();
+                jobData.append(bytes.getByteArray());
+                charset = pje.getCharset();
+            }
+            
+            JFrame j = new JFrame(title);
+            j.setUndecorated(true);
+            j.setLayout(new FlowLayout());
+            this.setBorder(null);
+
+            String jobDataString = null;
+            try {
+                jobDataString = new String(jobData.getByteArray(), charset.name());
+                jobDataString += "</html>";
+            } catch (UnsupportedEncodingException ex) {
+                LogIt.log(ex);
+            }
+            
+            this.setText(jobDataString);
+            j.add(this);
+            j.pack();
+            j.setExtendedState(j.ICONIFIED);
+            j.setVisible(true);
+
+            // Elimate any margins
+            HashPrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();             
+            attr.add(new MediaPrintableArea(0f, 0f, getWidth()/72f, getHeight()/72f, MediaPrintableArea.INCH));               
+
+            PrinterJob job = PrinterJob.getPrinterJob();    
+            try {
+                job.setPrintService(printer.getPrintService());
+            } catch (PrinterException ex) {
+                LogIt.log(ex);
+            }
+            job.setPrintable(this);
+            job.setJobName(title);
+            try {
+                job.print(attr);
+            } catch (PrinterException ex) {
+                LogIt.log(ex);
+            }
+            j.setVisible(false);
+            j.dispose();
+
+        }
         else if(type == PrintJobType.TYPE_PS) {
-            // PostScript jobs only support a single PrintJobElement
-            // This should be either an image (type IMAGE_PS) or pdf
+            
             try {
                 
                 PrintJobElement firstElement = rawData.get(0);
@@ -318,6 +390,17 @@ public class PrintJob implements Runnable, Printable {
             }
             else if(pje.type == "PDF") {
                 return pje.printPDFRenderer(graphics, pageFormat, pageIndex);
+            }
+            else if(pje.type == "HTML") {
+                boolean doubleBuffered = super.isDoubleBuffered();
+                super.setDoubleBuffered(false);
+
+                Graphics2D g2d = (Graphics2D) graphics;
+                g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+                //g2d.translate(paper.getImageableX(), paper.getImageableY());
+                this.paint(g2d);
+                super.setDoubleBuffered(doubleBuffered);
+                return (PAGE_EXISTS);
             }
         }
         

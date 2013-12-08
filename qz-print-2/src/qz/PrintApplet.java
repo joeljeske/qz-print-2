@@ -314,6 +314,18 @@ public class PrintApplet extends Applet {
         spooler.appendFile(bytes, charset);
     }
     
+    public void appendHTML(String html) {
+        ByteArrayBuilder bytes = new ByteArrayBuilder();
+        
+        try {
+            bytes.append(html, charset);
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        }
+        spooler.appendHTML(bytes, charset);
+        
+    }
+    
     public void appendPDF(String url) {
         ByteArrayBuilder bytes = new ByteArrayBuilder();
             
@@ -337,8 +349,14 @@ public class PrintApplet extends Applet {
     }
     
     // Stub function for backwards compatability
-    // PrintJob will determine if it's a raw or ps job when data is being added
+    // PrintJobElements will determine their type when printing
     public boolean printPS() {
+        return print();
+    }
+    
+    // Stub function for backwards compatability
+    // PrintJobElements will determine their type when printing
+    public boolean printHTML() {
         return print();
     }
     

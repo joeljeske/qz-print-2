@@ -194,6 +194,14 @@ public class PrintSpooler implements Runnable {
         currentJob.appendFile(url, charset);
     }
     
+    public void appendHTML(ByteArrayBuilder html, Charset charset) {
+        if(currentJob == null) {
+            createJob();
+        }
+        
+        currentJob.appendHTML(html, charset);
+    }
+    
     public void appendPDF(ByteArrayBuilder url, Charset charset) {
         if(currentJob == null) {
             createJob();
