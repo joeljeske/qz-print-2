@@ -21,8 +21,6 @@
  */
 package qz;
 
-import java.awt.Graphics;
-import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -85,10 +83,6 @@ public class FilePrinter implements Printer {
     // Empty function. FilePrinter's should never have a ps set
     public void setPrintService(PrintService ps) {
         
-    }
-
-    public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public void setName(String name) {

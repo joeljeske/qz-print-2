@@ -21,8 +21,6 @@
  */
 package qz;
 
-import java.awt.Graphics;
-import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -134,10 +132,6 @@ public class RawPrinter implements Printer {
         
     }
     
-    public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        // This function is not supported on Raw printers
-    }
-
     public boolean ready() {
         return true;
     }

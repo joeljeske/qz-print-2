@@ -212,9 +212,14 @@ public class PrintSpooler implements Runnable {
     
     public boolean print() {
         if(currentJob == null) {
+            LogIt.log("No data has been provided.");
             return false;
         }
         
+        if(currentPrinter == null) {
+            LogIt.log("No printer specified.");
+            return false;
+        }
         currentJob.setPrinter(currentPrinter);
         currentJob.prepareJob();
         currentJob = null;

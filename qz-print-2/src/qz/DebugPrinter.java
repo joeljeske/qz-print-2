@@ -21,8 +21,6 @@
  */
 package qz;
 
-import java.awt.Graphics;
-import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import javax.print.PrintService;
 
@@ -58,10 +56,6 @@ public class DebugPrinter implements Printer {
 
     public String getType() {
         return "DEBUG";
-    }
-
-    public void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public void setName(String name) {

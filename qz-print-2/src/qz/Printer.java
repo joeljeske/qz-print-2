@@ -21,9 +21,6 @@
  */
 package qz;
 
-import java.awt.Graphics;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import javax.print.PrintService;
 
@@ -40,10 +37,7 @@ public interface Printer {
     
     // This function sends raw data to a Raw type printer
     public abstract void printRaw(ByteArrayBuilder data) throws PrinterException;
-    
-    // This functions sends graphics data to a PostScript printer
-    public abstract void printPS(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException;
-    
+
     /**
      * Returns a boolean value based on whether the printer is ready to accept 
      * a job
