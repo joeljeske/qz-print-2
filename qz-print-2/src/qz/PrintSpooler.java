@@ -297,14 +297,26 @@ public class PrintSpooler implements Runnable {
     }
 
     void findPrinter(String printerName) {
+        
+        
+        
         ListIterator<Printer> iterator = printerList.listIterator();
         
         while(iterator.hasNext()) {
             
             Printer printer = iterator.next();
-            if(printer.getName().equals(printerName)) {
-                currentPrinter = printer;
-                break;
+            if(printerName == null) {
+                PrintService defaultPS = PrintServiceLookup.lookupDefaultPrintService();
+                if(printer.getPrintService().equals(defaultPS)) {
+                    currentPrinter = printer;
+                    break;
+                }
+            }
+            else {
+                if(printer.getName().equals(printerName)) {
+                    currentPrinter = printer;
+                    break;
+                }
             }
         }
     }
