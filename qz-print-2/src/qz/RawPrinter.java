@@ -57,6 +57,8 @@ public class RawPrinter implements Printer {
 
     public void printRaw(ByteArrayBuilder data) throws PrinterException {
         
+        docFlavor = DocFlavor.BYTE_ARRAY.TEXT_PLAIN_UTF_8;
+        
         SimpleDoc doc = new SimpleDoc(data.getByteArray(), docFlavor, docAttr);
         
         reqAttr.add(new JobName(jobTitle, Locale.getDefault()));

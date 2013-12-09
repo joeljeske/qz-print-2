@@ -234,13 +234,14 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             }
             
             try {
-                RawPrinter rawPrinter = (RawPrinter)printer;
-                rawPrinter.setJobTitle(title);
+                
+                printer.setJobTitle(title);
                 if(jobHost != null) {
+                    RawPrinter rawPrinter = (RawPrinter)printer;
                     rawPrinter.printToHost(jobData, jobHost, jobPort);
                 }
                 else {
-                    rawPrinter.printRaw(jobData);
+                    printer.printRaw(jobData);
                 }
             }
             catch(PrinterException ex) {
