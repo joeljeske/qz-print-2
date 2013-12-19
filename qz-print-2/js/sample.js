@@ -59,7 +59,7 @@ function qzReady() {
 /**
 * Returns whether or not the applet is not ready to print.
 * Displays an alert if not ready.
-*/
+**/
 function notReady() {
 	// If applet is not loaded, display an error.
 	if (!qz) {
@@ -76,7 +76,7 @@ function notReady() {
 
 /**
 * Automatically gets called when "qz.print()" is finished.
-*/
+**/
 function qzDonePrinting() {
 	// Alert error, if any
 	if (qz.getException()) {
@@ -93,40 +93,31 @@ function qzDonePrinting() {
 * Prototype function for finding the "default printer" on the system
 * Usage:
 *    qz.findPrinter();
-*    window['qzDoneFinding'] = function() { alert(qz.getPrinter()); };
 ***************************************************************************/
 function useDefaultPrinter() {
+
 	if (qz) {
 		// Searches for default printer
 		qz.findPrinter();
-	}
-	
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFinding'] = function() {
+		
 		// Alert the printer name to user
 		var printer = qz.getPrinter();
-		alert(printer !== null ? 'Default printer found: "' + printer :
+		alert(printer !== null ? 'Default printer found: "' + printer + '"' :
 			'Default printer ' + 'not found');
-		
-		// Remove reference to this function
-		window['qzDoneFinding'] = null;
-	};
+	}
+	
 }
 
 /***************************************************************************
 * Prototype function for printing raw commands directly to the filesystem
 * Usage:
-*    qz.append("\n\nHello world!\n\n");
 *    qz.printToFile("C:\\Users\\Jdoe\\Desktop\\test.txt");
+*    qz.append("\n\nHello world!\n\n");
 ***************************************************************************/
 function printToFile() {
+
 	if (qz) {
-		// Any printer is ok since we are writing to the filesystem instead
-		qz.findPrinter();
-	}
-	
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFinding'] = function() {
+		// We don't need a printer since we are writing to the filesystem instead
 		// Send characters/raw commands to qz using "append"
 		// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
 		qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\n");
@@ -137,10 +128,8 @@ function printToFile() {
 		// i.e.  qz.printToFile("\\\\server\\printer");
 		//       qz.printToFile("/home/user/test.txt");
 		qz.printToFile("C:\\qz-print_test-print.txt");
-		
-		// Remove reference to this function
-		window['qzDoneFinding'] = null;
-	};
+
+	}
 	
 }
 
@@ -151,13 +140,10 @@ function printToFile() {
 *    qz.printToHost("192.168.1.254", 9100);
 ***************************************************************************/
 function printToHost() {
-	if (qz) {
-		// Any printer is ok since we are writing to a host address instead
-		qz.findPrinter();
-	}
+
 	
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFinding'] = function() {
+	if (qz) {
+		// We don't need a printer since we are writing to a host instead
 		// Send characters/raw commands to qz using "append"
 		// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
 		qz.append("A590,1600,2,3,1,1,N,\"QZ Print Plugin " + qz.getVersion() + " sample.html\"\n");
@@ -167,20 +153,18 @@ function printToHost() {
 		// qz.printToHost(String hostName, int portNumber);
 		// qz.printToHost("192.168.254.254");   // Defaults to 9100
 		qz.printToHost("192.168.1.254", 9100);
-		
-		// Remove reference to this function
-		window['qzDoneFinding'] = null;
-	};
-}
 
+	}
+	
+}
 
 /***************************************************************************
 * Prototype function for finding the closest match to a printer name.
 * Usage:
 *    qz.findPrinter('zebra');
-*    window['qzDoneFinding'] = function() { alert(qz.getPrinter()); };
 ***************************************************************************/
 function findPrinter(name) {
+	
 	// Get printer name from input box
 	var p = document.getElementById('printer');
 	if (name) {
@@ -189,52 +173,37 @@ function findPrinter(name) {
 	if (qz) {
 		// Searches for locally installed printer with specified name
 		qz.findPrinter(p.value);
-	} else {
-		// If applet is not loaded, display an error.
-		return alert('Error:\n\n\tApplet is not loaded!');
-	}
-	 
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFinding'] = function() {
-		var p = document.getElementById('printer');
 		var printer = qz.getPrinter();
 		
 		// Alert the printer name to user
 		alert(printer !== null ? 'Printer found: "' + printer + 
 			'" after searching for "' + p.value + '"' : 'Printer "' + 
 			p.value + '" not found.');
-		
-		// Remove reference to this function
-		window['qzDoneFinding'] = null;
-	};
-}
 
-/***************************************************************************
-* Prototype function for listing all printers attached to the system
-* Usage:
-*    qz.findPrinter('\\{dummy_text\\}');
-*    window['qzDoneFinding'] = function() { alert(qz.getPrinters()); };
-***************************************************************************/
-function findPrinters() {
-	if (qz) {
-		// Searches for a locally installed printer with a bogus name
-		qz.findPrinter('\\{bogus_printer\\}');
 	} else {
 		// If applet is not loaded, display an error.
 		return alert('Error:\n\n\tApplet is not loaded!');
 	}
 	
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFinding'] = function() {
+}
+
+/***************************************************************************
+* Prototype function for listing all printers attached to the system
+* Usage:
+*    qz.getPrinters();
+***************************************************************************/
+function findPrinters() {
+
+	if (qz) {
 		// Get the CSV listing of attached printers
 		var printers = qz.getPrinters().split(',');
 		for (i in printers) {
 			alert(printers[i] ? printers[i] : 'Unknown');      
 		}
-		
-		// Remove reference to this function
-		window['qzDoneFinding'] = null;
-	};
+	} else {
+		// If applet is not loaded, display an error.
+		return alert('Error:\n\n\tApplet is not loaded!');
+	}
 	
 }
 
@@ -246,7 +215,7 @@ function findPrinters() {
 ***************************************************************************/
 function printEPL() {
 	if (notReady()) { return; }
-	 
+	
 	// Send characters/raw commands to qz using "append"
 	// This example is for EPL.  Please adapt to your printer language
 	// Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
@@ -260,19 +229,10 @@ function printEPL() {
 	qz.append('A310,116,0,3,1,1,N,"FROM SAMPLE.HTML"\n');
 	qz.append('A310,146,0,3,1,1,N,"QZINDUSTRIES.COM"\n');
 	qz.appendImage(getPath() + 'img/image_sample_bw.png', 'EPL', 150, 300);
-			
-	// Automatically gets called when "qz.appendImage()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Append the rest of our commands
-		qz.append('\nP1,1\n');
-		
-		// Tell the applet to print.
-		qz.print();
-		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
- }
+
+	// Tell the applet to print.
+	qz.print();
+}
  
 /***************************************************************************
 * Prototype function for printing raw ESC/POS commands
@@ -285,20 +245,14 @@ function printESCP() {
 	
 	// Append a png in ESCP format with single pixel density
 	qz.appendImage(getPath() + "img/image_sample_bw.png", "ESCP", "single");
-			
-	// Automatically gets called when "qz.appendImage()" is finished.
-	window["qzDoneAppending"] = function() {
-		// Append the rest of our commands
-		qz.append('\nPrinted using qz-print plugin.\n\n\n\n\n\n');
-		
-		// Tell the apple to print.
-		qz.print();
-		
-		// Remove any reference to this function
-		window['qzDoneAppending'] = null;
-	};
-}
+	
+	// Append the rest of our commands
+	qz.append('\nPrinted using qz-print plugin.\n\n\n\n\n\n');
+	
+	// Tell the apple to print.
+	qz.print();
 
+}
 
 /***************************************************************************
 * Prototype function for printing raw ZPL commands
@@ -316,18 +270,13 @@ function printZPL() {
 	qz.append('^FO50,50^ADN,36,20^FDPRINTED USING QZ PRINT PLUGIN ' + qz.getVersion() + '\n');
 	qz.appendImage(getPath() + 'img/image_sample_bw.png', 'ZPLII');
 			
-	// Automatically gets called when "qz.appendImage()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Append the rest of our commands
-		qz.append('^FS\n');
-		qz.append('^XZ\n');  
-		
-		// Tell the apple to print.
-		qz.print();
-		
-		// Remove any reference to this function
-		window['qzDoneAppending'] = null;
-	};
+	// Append the rest of our commands
+	qz.append('^FS\n');
+	qz.append('^XZ\n');  
+	
+	// Tell the apple to print.
+	qz.print();
+	
 }
 
 /***************************************************************************
@@ -449,14 +398,12 @@ function printPages() {
 	
 	qz.appendFile(getPath() + "misc/epl_multiples.txt");
 	
-	// Automatically gets called when "qz.appendFile()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Tell the applet to print.
-		qz.print();
+	// Tell the applet to print.
+	qz.print();
 		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
+	// Remove reference to this function
+	window['qzDoneAppending'] = null;
+	
 }
 
 /***************************************************************************
@@ -476,15 +423,12 @@ function printXML() {
 	// Example:
 	//    qz.appendXML("http://yoursite.com/zpl.xml", "node_1");
 	qz.appendXML(getPath() + "misc/zpl_sample.xml", "v7:Image");
+
+	// Tell the applet to print.
+	qz.print();
 	
-	// Automatically gets called when "qz.appendXML()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Tell the applet to print.
-		qz.print();
-		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
+	// Remove reference to this function
+	window['qzDoneAppending'] = null;
 }
 
 /***************************************************************************
@@ -529,14 +473,9 @@ function printFile(file) {
 	// Append raw or binary text file containing raw print commands
 	qz.appendFile(getPath() + "misc/" + file);
 	
-	// Automatically gets called when "qz.appendFile()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Tell the applet to print.
-		qz.print();
-		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
+	// Tell the applet to print.
+	qz.print();
+
 }
 
 /***************************************************************************
@@ -563,14 +502,9 @@ function printImage(scaleImage) {
 	// Append our image (only one image can be appended per print)
 	qz.appendImage(getPath() + "img/image_sample.png");
 	
-	// Automatically gets called when "qz.appendImage()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Tell the applet to print PostScript.
-		qz.printPS();
+	// Tell the applet to print PostScript.
+	qz.printPS();
 		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
 }
 
 /***************************************************************************
@@ -582,17 +516,13 @@ function printImage(scaleImage) {
 ***************************************************************************/ 
 function printPDF() {
 	if (notReady()) { return; }
-	// Append our pdf (only one pdf can be appended per print)
+	
+	// Append our pdf
 	qz.appendPDF(getPath() + "misc/pdf_sample.pdf");
 	
-	// Automatically gets called when "qz.appendPDF()" is finished.
-	window['qzDoneAppending'] = function() {
-		// Tell the applet to print PostScript.
-		qz.printPS();
-		
-		// Remove reference to this function
-		window['qzDoneAppending'] = null;
-	};
+	// Tell the applet to print PostScript.
+	qz.printPS();
+	
 }
 
 /***************************************************************************
@@ -622,7 +552,7 @@ function printHTML() {
 	qz.printPS();
 }
 	
-		/***************************************************************************
+/***************************************************************************
 * Prototype function for getting the primary IP or Mac address of a computer
 * Usage:
 *    qz.findNetworkInfo();
@@ -716,7 +646,6 @@ function useAlternatePrinting() {
 	alert('Alternate CUPS printing set to "' + !alternate + '"');
 }
 
-
 /***************************************************************************
 * Prototype function to list all available com ports availabe to this PC
 * used for RS232 communication.  Relies on jssc_qz.jar signed and in the 
@@ -745,7 +674,6 @@ function listSerialPorts() {
 		window['qzDoneFindingPorts'] = null;
 	};
 }
-
 
 /***************************************************************************
 * Prototype function to open the specified communication port for 2-way 
@@ -796,7 +724,6 @@ function closeSerialPort() {
 	};
 }
 
-
 /***************************************************************************
 * Prototype function to send data to the open port
 *    qz.setSerialBegin(chr(2));
@@ -845,7 +772,6 @@ function sendSerialData() {
 ****************************************************************************
 ***************************************************************************/
 
-
 /***************************************************************************
 * Gets the current url's path, such as http://site.com/example/dist/
 ***************************************************************************/
@@ -886,17 +812,6 @@ function allowMultiple() {
 	alert('Allowing of multiple applet instances set to "' + !multiple + '"');
   }
 }
-	
-/* KEEP 
-* Placeholder for deployJava 
-* script type="text/javascript" src="https://www.java.com/js/deployJava.js"
-* var attributes = {code:'qz.PrintApplet.class',
-*               archive:'qz-print.jar',
-*               width:1, height:1} ;
-* var parameters = {jnlp_href: "qz-print_jnlp.jnlp"} ;
-* var version = '1.5';
-* deployJava.runApplet(attributes, parameters, version);
-* */
 
 /***************************************************************************
 * Sample function to demonstrate getting and displaying spool information

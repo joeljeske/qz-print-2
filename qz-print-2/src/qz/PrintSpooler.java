@@ -296,9 +296,7 @@ public class PrintSpooler implements Runnable {
         return printerListString;
     }
 
-    void findPrinter(String printerName) {
-        
-        
+    boolean findPrinter(String printerName) {
         
         ListIterator<Printer> iterator = printerList.listIterator();
         
@@ -319,6 +317,9 @@ public class PrintSpooler implements Runnable {
                 }
             }
         }
+        
+        return true;
+        
     }
 
     void setPrinter(int printerIndex) {

@@ -137,8 +137,9 @@ public class PrintApplet extends Applet {
     }
     
     public void findPrinter(String printerName) {
-        spooler.findPrinter(printerName);
-        btools.notifyBrowser("qzDoneFinding");
+        if(spooler.findPrinter(printerName)) {
+            btools.notifyBrowser("qzDoneFinding");
+        };
     }
     
     public String getPrinter() {
