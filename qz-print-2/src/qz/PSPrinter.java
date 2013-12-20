@@ -57,7 +57,6 @@ public class PSPrinter implements Printer {
     }
 
     public boolean ready() {
-        LogIt.log("Printer Attributes" + ps.getAttributes().toString());
         return true;
     }
 
@@ -80,5 +79,5 @@ public class PSPrinter implements Printer {
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
-    
+        
 }

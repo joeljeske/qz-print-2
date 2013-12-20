@@ -43,6 +43,7 @@ import java.util.logging.Logger;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
 import javax.print.SimpleDoc;
+import javax.print.attribute.Attribute;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
 import javax.print.attribute.standard.MediaPrintableArea;
@@ -73,7 +74,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     private PaperFormat paperSize;
     private String jobHost;
     private int jobPort;
-    
+    private boolean logPSFeatures;
     private boolean autoSize;
 
     public void run() {
@@ -292,6 +293,11 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             } catch (PrinterException ex) {
                 LogIt.log(ex);
             }
+            
+            if(logPSFeatures) {
+                logSupportedPrinterFeatures(job);
+            }
+            
             job.setPrintable(this);
             job.setJobName(title);
             try {
@@ -309,6 +315,10 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                 
                 PrintJobElement firstElement = rawData.get(0);
                 PrinterJob job = PrinterJob.getPrinterJob();
+                
+                if(logPSFeatures) {
+                    logSupportedPrinterFeatures(job);
+                }
                 
                 int w;
                 int h;
@@ -429,6 +439,18 @@ public class PrintJob extends JLabel implements Runnable, Printable {
 
     void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void logSupportedPrinterFeatures(PrinterJob job) {
+        LogIt.log(Level.INFO, "Supported Printing Attributes:");
+        for (Class<?> cl : job.getPrintService().getSupportedAttributeCategories()) {
+            LogIt.log(Level.INFO, "   Attr type = " + cl + "=" + job.getPrintService().getDefaultAttributeValue((Class<? extends Attribute>) cl));
+        }
+    }
+
+    void setLogPostScriptFeatures(boolean logPSFeatures) {
+        this.logPSFeatures = logPSFeatures;
     }
     
 }

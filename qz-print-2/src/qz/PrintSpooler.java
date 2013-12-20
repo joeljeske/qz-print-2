@@ -57,6 +57,7 @@ public class PrintSpooler implements Runnable {
     private FilePrinter filePrinter;
     private PaperFormat paperSize;
     private boolean autoSize;
+    private boolean logPSFeatures;
     
     public void PrintSpooler() {
         
@@ -76,6 +77,7 @@ public class PrintSpooler implements Runnable {
         // Initialize system variables
         running = true;
         filePrinter = new FilePrinter();
+        logPSFeatures = false;
         
         // Configurable variables
         loopDelay = 1000;
@@ -143,6 +145,8 @@ public class PrintSpooler implements Runnable {
         if(autoSize) {
             currentJob.setAutoSize(true);
         }
+        
+        currentJob.setLogPostScriptFeatures(logPSFeatures);
         
         spool.add(currentJob);
     }
@@ -357,6 +361,18 @@ public class PrintSpooler implements Runnable {
 
     void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
+    }
+    
+    boolean getLogPostScriptFeatures() {
+        return logPSFeatures;
+    }
+
+    void setLogPostScriptFeatures(boolean logPSFeatures) {
+        this.logPSFeatures = logPSFeatures;
+        if(currentJob != null) {
+            currentJob.setLogPostScriptFeatures(logPSFeatures);
+        }
+        LogIt.log("Console logging of PostScript printing features set to \"" + logPSFeatures + "\"");
     }
     
 }

@@ -426,6 +426,14 @@ public class PrintApplet extends Applet {
         spooler.setAutoSize(autoSize);
     }
     
+    public boolean getLogPostScriptFeatures() {
+        return spooler.getLogPostScriptFeatures();
+    }
+    
+    public void setLogPostScriptFeatures(boolean logPSFeatures) {
+        spooler.setLogPostScriptFeatures(logPSFeatures);
+    }
+    
     // Deprecated functions
     // TODO: Properly address deprecating these functions
     
