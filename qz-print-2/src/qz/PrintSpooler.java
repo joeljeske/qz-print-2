@@ -302,7 +302,9 @@ public class PrintSpooler implements Runnable {
         return printerListString;
     }
 
-    boolean findPrinter(String printerName) {
+    public void findPrinter(String printerName) {
+        
+        currentPrinter = null;
         
         ListIterator<Printer> iterator = printerList.listIterator();
         
@@ -317,14 +319,19 @@ public class PrintSpooler implements Runnable {
                 }
             }
             else {
-                if(printer.getName().equals(printerName)) {
+                if(printer.getName().indexOf(printerName) != -1) {
                     currentPrinter = printer;
                     break;
                 }
             }
         }
         
-        return true;
+        if(currentPrinter != null) {
+            LogIt.log("Found printer \"" + currentPrinter.getName() + "\".");
+        }
+        else {
+            LogIt.log("Could not find printer with name containing \"" + printerName + "\".");
+        }
         
     }
 
