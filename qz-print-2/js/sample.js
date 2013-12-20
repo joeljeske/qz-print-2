@@ -473,10 +473,7 @@ function printPages() {
 	
 	// Tell the applet to print.
 	qz.print();
-		
-	// Remove reference to this function
-	window['qzDoneAppending'] = null;
-	
+
 }
 
 /***************************************************************************
