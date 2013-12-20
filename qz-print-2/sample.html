@@ -5,7 +5,7 @@
 <head>
 	<title>QZ Print Plugin</title>
 	
-	<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
+	<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
 	<script type="text/javascript" src="js/html2canvas.js"></script>
 	<script type="text/javascript" src="js/jquery.plugin.html2canvas.js"></script>	
 	<script type="text/javascript" src="js/deployJava.js"></script>
@@ -35,14 +35,6 @@
 					<input type="button" onClick="useDefaultPrinter()" value="Use Default Printer">
 					<br />
 					<br />
-					<!--
-					<applet id="qz" archive="./qz-print-2.jar" name="QZ Print Plugin 2" code="qz.PrintApplet.class" width="55" height="55">
-					<param name="jnlp_href" value="qz-print-2_jnlp.jnlp">
-					<param name="cache_option" value="plugin">
-					<param name="disable_logging" value="false">
-					<param name="initial_focus" value="false"></applet>
-					<br />
-					-->
 					<div id="loaded">
 						Loading...
 					</div>
@@ -65,6 +57,8 @@
 					<a href="javascript:findPrinter('Star');">Star</a>
 					<br />
 					<br />
+					<input type="button" onClick="printEPCL()" value="Print EPCL" /><br />
+					(Zebra Card Printer)<br /><br />
 					<input type="button" onClick="print64()" value="Print Base64" />
 					<br />
 					<input type="button" onClick="printPages()" value="Print Spooling Every 2" />

@@ -30,6 +30,7 @@ import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
+import qz.exception.InvalidFileTypeException;
 
 /**
  * The PrintSpooler will maintain a list of all print jobs and their status.
@@ -229,7 +230,12 @@ public class PrintSpooler implements Runnable {
     public void printToFile(String filePath) {
         if(currentJob != null) {
             
-            filePrinter.setOutputPath(filePath);
+            try {
+                filePrinter.setOutputPath(filePath);
+            } catch (InvalidFileTypeException ex) {
+                LogIt.log(ex);
+            }
+            
             currentJob.setPrinter(filePrinter);
             
             currentJob.prepareJob();

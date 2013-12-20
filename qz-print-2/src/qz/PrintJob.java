@@ -318,8 +318,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                     h = firstElement.getBufferedImage().getHeight();
                 } 
                 else if (firstElement.getPDFFile() != null) {
-                    w = ((Float)firstElement.getPDFFile().call("getPage", 1).call("getWidth").get()).intValue();
-                    h = ((Float)firstElement.getPDFFile().call("getPage", 1).call("getHeight").get()).intValue();
+                    w = (int) firstElement.getPDFFile().getPage(1).getWidth();
+                    h = (int) firstElement.getPDFFile().getPage(1).getHeight();
                 }
                 else {
                     throw new PrinterException("Corrupt or missing file supplied.");

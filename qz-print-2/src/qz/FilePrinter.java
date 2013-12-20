@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.print.PrintService;
+import qz.exception.InvalidFileTypeException;
 
 /**
  * FilePrinter is a special type of Printer that outputs to a file
@@ -42,8 +43,15 @@ public class FilePrinter implements Printer {
         
     }
 
-    public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
+    public void setOutputPath(String outputPath) throws InvalidFileTypeException {
+        // Check for vulnerable file extensions, such as "exe" or "bat", etc.
+        if (FileUtilities.isBadExtension(outputPath)) {
+            throw new InvalidFileTypeException("Writing file \"" + 
+                    outputPath + "\" is prohibited for security reason: "
+                    + "Prohibited file extension.");
+        } else {
+            this.outputPath = (outputPath);
+        }
     }
     
     public String getName() {

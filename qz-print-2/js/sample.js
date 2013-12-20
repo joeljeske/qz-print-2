@@ -75,6 +75,27 @@ function notReady() {
 }
 
 /**
+* Returns is the applet is not loaded properly
+*/
+function isLoaded() {
+	if (!qz) {
+		alert('Error:\n\n\tPrint plugin is NOT loaded!');
+		return false;
+	} else {
+		try {
+			if (!qz.isActive()) {
+				alert('Error:\n\n\tPrint plugin is loaded but NOT active!');
+				return false;
+			}
+		} catch (err) {
+			alert('Error:\n\n\tPrint plugin is NOT loaded properly!');
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
 * Automatically gets called when "qz.print()" is finished.
 **/
 function qzDonePrinting() {
@@ -277,6 +298,58 @@ function printZPL() {
 	// Tell the apple to print.
 	qz.print();
 	
+}
+
+/***************************************************************************
+* Prototype function for printing syntactically proper raw commands directly 
+* to a EPCL capable card printer, such as the Zebra P330i.  Uses helper
+* appendEPCL() to add the proper NUL, data length, escape character and 
+* newline per spec:  https://km.zebra.com/kb/index?page=content&id=SO8390
+* Usage:
+*    appendEPCL('A1');
+*    qz.print();
+***************************************************************************/
+function printEPCL()  {
+	if (notReady()) { return; }
+	
+	appendEPCL('+RIB 4');      // Monochrome ribbon
+	appendEPCL('F');           // Clear monochrome print buffer
+	appendEPCL('+C 8');        // Adjust monichrome intensity
+	appendEPCL('&R');          // Reset magnetic encoder
+	appendEPCL('&CDEW 0 0');   // Set R/W encoder to ISO default
+	appendEPCL('&CDER 0 0');   // Set R/W encoder to ISO default
+	appendEPCL('&SVM 0');      // Disable magnetic encoding verifications
+	appendEPCL('T 80 600 0 1 0 45 1 QZ INDUSTRIES');	// Write text buffer
+	appendEPCL('&B 1 123456^INDUSTRIES/QZ^789012');	// Write mag strip buffer
+	appendEPCL('&E*');         // Encode magnetic data
+	appendEPCL('I 10');        // Print card (10 returns to print ready pos.)
+	appendEPCL('MO');          // Move card to output hopper
+	
+	qz.print();
+}
+
+/**
+* EPCL helper function that appends a single line of EPCL data, taking into 
+* account special EPCL NUL characters, data length, escape character and 
+* carriage return
+*/
+function appendEPCL(data) {
+	if (data == null || data.length == 0) { 
+		return alert('Empty EPCL data, skipping!');
+	}
+	
+	// Data length for this command, in 2 character Hex (base 16) format
+	var len = (data.length + 2).toString(16);
+	len = len.length < 2 ? '0' + len : len;
+	
+	// Append three NULs
+	qz.appendHex('x00x00x00');
+	// Append our command length, in base16 (hex)
+	qz.appendHex('x' + len);
+	// Append our command
+	qz.append(data);
+	// Append carriage return
+	qz.append('\r');
 }
 
 /***************************************************************************
@@ -560,23 +633,21 @@ function printHTML() {
 *       qz.getIP()); };
 ***************************************************************************/ 
 function listNetworkInfo() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	} 
-	
-	// Makes a quick connection to www.google.com to determine the active interface
-	// Note, if you don't wish to use google.com, you can customize the host and port
-	// qz.getNetworkUtilities().setHostname("qzindustries.com");
-	// qz.getNetworkUtilities().setPort(80);
-	qz.findNetworkInfo();
-	
-	// Automatically gets called when "qz.findPrinter()" is finished.
-	window['qzDoneFindingNetwork'] = function() {
-		alert("Primary adapter found: " + qz.getMac() + ", IP: " + qz.getIP());
+	if (isLoaded()) {
+		// Makes a quick connection to www.google.com to determine the active interface
+		// Note, if you don't wish to use google.com, you can customize the host and port
+		// qz.getNetworkUtilities().setHostname("qzindustries.com");
+		// qz.getNetworkUtilities().setPort(80);
+		qz.findNetworkInfo();
 		
-		// Remove reference to this function
-		window['qzDoneFindingNetwork'] = null;
-	};
+		// Automatically gets called when "qz.findPrinter()" is finished.
+		window['qzDoneFindingNetwork'] = function() {
+			alert("Primary adapter found: " + qz.getMac() + ", IP: " + qz.getIP());
+			
+			// Remove reference to this function
+			window['qzDoneFindingNetwork'] = null;
+		};
+	}
 }
 
 /***************************************************************************
@@ -619,12 +690,11 @@ function printHTML5Page() {
 *    qz.printPS();
 ***************************************************************************/ 
 function logFeatures() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	} 
-	var logging = qz.getLogPostScriptFeatures();
-	qz.setLogPostScriptFeatures(!logging);
-	alert('Logging of PostScript printer capabilities to console set to "' + !logging + '"');
+	if (isLoaded()) {
+		var logging = qz.getLogPostScriptFeatures();
+		qz.setLogPostScriptFeatures(!logging);
+		alert('Logging of PostScript printer capabilities to console set to "' + !logging + '"');
+	}
 }
 
 /***************************************************************************
@@ -638,13 +708,13 @@ function logFeatures() {
 *    qz.print();
 ***************************************************************************/ 
 function useAlternatePrinting() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	} 
-	var alternate = qz.isAlternatePrinting();
-	qz.useAlternatePrinting(!alternate);
-	alert('Alternate CUPS printing set to "' + !alternate + '"');
+	if (isLoaded()) {
+		var alternate = qz.isAlternatePrinting();
+		qz.useAlternatePrinting(!alternate);
+		alert('Alternate CUPS printing set to "' + !alternate + '"');
+	}
 }
+
 
 /***************************************************************************
 * Prototype function to list all available com ports availabe to this PC
@@ -654,26 +724,25 @@ function useAlternatePrinting() {
 *    window['qzDoneFindingPorts'] = function() { alert(qz.getPorts()); };
 ***************************************************************************/ 
 function listSerialPorts() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	} 
-	
-	// Search the PC for communication (RS232, COM, tty) ports
-	qz.findPorts();
-	
-	// Automatically called when "qz.findPorts()" is finished
-	window['qzDoneFindingPorts'] = function() {
-		var ports = qz.getPorts().split(",");
-		for (p in ports) {
-			if (p == 0) {
-					document.getElementById("port_name").value = ports[p];
+	if (isLoaded()) {
+		// Search the PC for communication (RS232, COM, tty) ports
+		qz.findPorts();
+		
+		// Automatically called when "qz.findPorts()" is finished
+		window['qzDoneFindingPorts'] = function() {
+			var ports = qz.getPorts().split(",");
+			for (p in ports) {
+				if (p == 0) {
+						document.getElementById("port_name").value = ports[p];
+				}
+				alert(ports[p]);
 			}
-			alert(ports[p]);
-		}
-		// Remove reference to this function
-		window['qzDoneFindingPorts'] = null;
-	};
+			// Remove reference to this function
+			window['qzDoneFindingPorts'] = null;
+		};
+	}
 }
+
 
 /***************************************************************************
 * Prototype function to open the specified communication port for 2-way 
@@ -683,21 +752,20 @@ function listSerialPorts() {
 *    window['qzDoneOpeningPort'] = function(port) { alert(port); };
 ***************************************************************************/ 
 function openSerialPort() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	}
-	qz.openPort(document.getElementById("port_name").value);
+	if (isLoaded()) {
+		qz.openPort(document.getElementById("port_name").value);
 	
-	// Automatically called when "qz.openPort()" is finished (even if it fails to open)
-	window['qzDoneOpeningPort'] = function(portName) {
-		if (qz.getException()) {
-			alert("Could not open port [" + portName + "] \n\t" + 
-				qz.getException().getLocalizedMessage());
-			qz.clearException();
-		} else {
-			alert("Port [" + portName +  "] is open!");
-		}
-	};
+		// Automatically called when "qz.openPort()" is finished (even if it fails to open)
+		window['qzDoneOpeningPort'] = function(portName) {
+			if (qz.getException()) {
+				alert("Could not open port [" + portName + "] \n\t" + 
+					qz.getException().getLocalizedMessage());
+				qz.clearException();
+			} else {
+				alert("Port [" + portName +  "] is open!");
+			}
+		};
+	}
 }
 
 /***************************************************************************
@@ -707,22 +775,22 @@ function openSerialPort() {
 *    window['qzDoneClosingPort'] = function(port) { alert(port); };
 ***************************************************************************/ 
 function closeSerialPort() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
+	if (isLoaded()) {
+		qz.closePort(document.getElementById("port_name").value);
+		
+		// Automatically called when "qz.closePort() is finished (even if it fails to close)
+		window['qzDoneClosingPort'] = function(portName) {
+			if (qz.getException()) {
+				alert("Could not close port [" + portName + "] \n\t" + 
+					qz.getException().getLocalizedMessage());
+				qz.clearException();
+			} else {
+				alert("Port [" + portName +  "] closed!");
+			}
+		};
 	}
-	qz.closePort(document.getElementById("port_name").value);
-	
-	// Automatically called when "qz.closePort() is finished (even if it fails to close)
-	window['qzDoneClosingPort'] = function(portName) {
-		if (qz.getException()) {
-			alert("Could not close port [" + portName + "] \n\t" + 
-				qz.getException().getLocalizedMessage());
-			qz.clearException();
-		} else {
-			alert("Port [" + portName +  "] closed!");
-		}
-	};
 }
+
 
 /***************************************************************************
 * Prototype function to send data to the open port
@@ -732,38 +800,36 @@ function closeSerialPort() {
 *    qz.send("COM1", "\nW\n");
 ***************************************************************************/ 
 function sendSerialData() {
-	if (!qz) {
-		return alert('Error:\n\n\tApplet is not loaded!');
-	}
-
-	// Beggining and ending patterns that signify port has responded
-	// chr(2) and chr(13) surround data on a Mettler Toledo Scale
-	qz.setSerialBegin(chr(2));
-	qz.setSerialEnd(chr(13));
-	// Baud rate, data bits, stop bits, parity, flow control
-	// "9600", "7", "1", "even", "none" = Default for Mettler Toledo Scale
-	qz.setSerialProperties("9600", "7", "1", "even", "none");
-	// Send raw commands to the specified port.
-	// W = weight on Mettler Toledo Scale
-	qz.send(document.getElementById("port_name").value, "\nW\n");
-	
-	// Automatically called when "qz.send()" is finished waiting for 
-	// a valid message starting with the value supplied for setSerialBegin()
-	// and ending with with the value supplied for setSerialEnd()
-	window['qzSerialReturned'] = function(portName, data) {
-		if (qz.getException()) {
-			alert("Could not send data:\n\t" + qz.getException().getLocalizedMessage());
-			qz.clearException();  
-		} else {
-			if (data == null || data == "") {       // Test for blank data
-				alert("No data was returned.")
-			} else if (data.indexOf("?") !=-1) {    // Test for bad data
-				alert("Device not ready.  Please wait.")
-			} else {                                // Display good data
-				alert("Port [" + portName + "] returned data:\n\t" + data);
+	if (isLoaded()) {
+		// Beggining and ending patterns that signify port has responded
+		// chr(2) and chr(13) surround data on a Mettler Toledo Scale
+		qz.setSerialBegin(chr(2));
+		qz.setSerialEnd(chr(13));
+		// Baud rate, data bits, stop bits, parity, flow control
+		// "9600", "7", "1", "even", "none" = Default for Mettler Toledo Scale
+		qz.setSerialProperties("9600", "7", "1", "even", "none");
+		// Send raw commands to the specified port.
+		// W = weight on Mettler Toledo Scale
+		qz.send(document.getElementById("port_name").value, "\nW\n");
+		
+		// Automatically called when "qz.send()" is finished waiting for 
+		// a valid message starting with the value supplied for setSerialBegin()
+		// and ending with with the value supplied for setSerialEnd()
+		window['qzSerialReturned'] = function(portName, data) {
+			if (qz.getException()) {
+				alert("Could not send data:\n\t" + qz.getException().getLocalizedMessage());
+				qz.clearException();  
+			} else {
+				if (data == null || data == "") {       // Test for blank data
+					alert("No data was returned.")
+				} else if (data.indexOf("?") !=-1) {    // Test for bad data
+					alert("Device not ready.  Please wait.")
+				} else {                                // Display good data
+					alert("Port [" + portName + "] returned data:\n\t" + data);
+				}
 			}
-		}
-	};
+		};
+	}
 }
 
 /***************************************************************************

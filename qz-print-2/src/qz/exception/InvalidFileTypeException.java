@@ -4,13 +4,13 @@ package qz.exception;
  *
  * @author Tres
  */
-public class InvalidRawImageException extends Exception {
+public class InvalidFileTypeException extends Exception {
 
     /**
      * Creates a new instance of
      * <code>InvalidRawImageException</code> without detail message.
      */
-    public InvalidRawImageException() {
+    public InvalidFileTypeException() {
     }
 
     /**
@@ -19,7 +19,7 @@ public class InvalidRawImageException extends Exception {
      *
      * @param msg the detail message.
      */
-    public InvalidRawImageException(String msg) {
+    public InvalidFileTypeException(String msg) {
         super(msg);
     }
 }

@@ -53,7 +53,16 @@ public class BrowserTools {
      */
     public boolean notifyBrowser(String function, Object[] o) {
         try {
+            String type = (String)window.eval("typeof(" + function + ")");
+            // Ubuntu doesn't properly raise exceptions when calling invalid
+            // functions, so this is the work-around
+            if (!type.equals("function")) {
+                throw new JSException("Object \"" + function + "\" does not "
+                        + "exist or is not a function.");
+            }
+            
             window.call(function, o);
+            
             LogIt.log(Level.INFO, "Succesfully called JavaScript function \""
                     + function + "(...)\"...");
             if (function.startsWith("jzebra")) {

@@ -40,6 +40,45 @@ import qz.exception.NullCommandException;
  * @author Tres Finocchiaro
  */
 public class FileUtilities {
+    
+    public static String[] badExtensions = new String[]{
+        "exe", "pif", "paf", "application", "msi", "com", "cmd", "bat", "lnk", // Windows Executable program or script
+        "gadget", // Windows desktop gadget
+        "msp", "mst", // Microsoft installer patch/transform file
+        "cpl", "scr", "ins", // Control Panel/Screen Saver/Internet Settings
+        "hta", // HTML application, run as trusted application without sandboxing
+        "msc", // Microsoft Management Console file
+        "jar", "jnlp", // Java Executable
+        "vb", "vbs", "vbe", "js", "jse", "ws", "wsf", "wsc", "wsh",// Windows Script
+        "ps1", "ps1xml", "ps2", "ps2xml", "ps1", "ps1xml", "ps2", "ps2xml", "psc1", "psc2", // Windows PowerShell script
+        "msh", "msh1", "msh2", "mshxml", "msh1xml", "msh2xml", // Monad/PowerShell script
+        "scf", "inf", // Windows Explorer/AutoRun command file
+        "reg", // Windows Registry file
+        "doc", "docx", "dot", "dotx", "dotm", // Microsoft Word
+        "xls", "xlt", "xlm", "xlsx", "xlsm", "xltx", "xltm", "xlsb", "xla", "xlam", "xll", "xlw", // Microsoft Excel
+        "ppt", "pps", "pptx", "pptm", "potx", "potm", "ppam", "ppsx", "ppsm", "sldx", "sldm", // Microsoft PowerPoint
+        "ade", "adp", "adn", "accdb", "accdr", "accdt", "mdb", "mda", "mdn", "mdt", // Microsoft Access
+        "mdw", "mdf", "mde", "accde", "mam", "maq", "mar", "mat", "maf", "ldb", "laccdb", // Microsoft Access
+        "app", "action", "bin", "command", "workflow", // Mac OS Application/Executable
+        "sh", "ksh", "csh", "pl", "py", "bash", "run",  // Unix Script
+        "ipa, apk", // iOS/Android App
+        "widget", // Yahoo Widget
+        "url" // Internet Shortcut
+    };
+    
+    public static boolean isBadExtension(String fileName) {
+        String[] tokens = fileName.split("\\.(?=[^\\.]+$)");
+        if (tokens.length == 2) { 
+            String extension = tokens[1];
+            for (String s : FileUtilities.badExtensions) {
+                if (s.equalsIgnoreCase(extension)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     public static byte[] readRawFile(String url) throws IOException {
         ByteArrayBuilder rawCmds = new ByteArrayBuilder();
         byte[] buffer = new byte[512];
