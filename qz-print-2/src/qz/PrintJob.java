@@ -106,7 +106,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     public void append(ByteArrayBuilder appendData, Charset charset) {
         type = PrintJobType.TYPE_RAW;
         try {
-            PrintJobElement pje = new PrintJobElement(this, appendData, "RAW", charset);
+            PrintJobElement pje = new PrintJobElement(this, appendData, PrintJobElementType.TYPE_RAW, charset);
             rawData.add(pje);
         }
         catch(NullPointerException e) {
@@ -117,7 +117,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
         type = PrintJobType.TYPE_RAW;
         try {
-            PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, imageX, imageY);
+            PrintJobElement pje = new PrintJobElement(this, imagePath, PrintJobElementType.TYPE_IMAGE, charset, lang, imageX, imageY);
             rawData.add(pje);
         }
         catch(NullPointerException e) {
@@ -127,7 +127,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int dotDensity) {
         type = PrintJobType.TYPE_RAW;
         try {
-            PrintJobElement pje = new PrintJobElement(this, imagePath, "IMAGE", charset, lang, dotDensity);
+            PrintJobElement pje = new PrintJobElement(this, imagePath, PrintJobElementType.TYPE_IMAGE, charset, lang, dotDensity);
             rawData.add(pje);
         }
         catch(NullPointerException e) {
@@ -137,31 +137,31 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     
     public void appendPSImage(ByteArrayBuilder url, Charset charset) {
         type = PrintJobType.TYPE_PS;
-        PrintJobElement pje = new PrintJobElement(this, url, "IMAGE_PS", charset);
+        PrintJobElement pje = new PrintJobElement(this, url, PrintJobElementType.TYPE_IMAGE_PS, charset);
         rawData.add(pje);
     }
 
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         type = PrintJobType.TYPE_RAW;
-        PrintJobElement pje = new PrintJobElement(this, url, "XML", charset, xmlTag);
+        PrintJobElement pje = new PrintJobElement(this, url, PrintJobElementType.TYPE_XML, charset, xmlTag);
         rawData.add(pje);
     }
     
     public void appendFile(ByteArrayBuilder url, Charset charset) {
         type = PrintJobType.TYPE_RAW;
-        PrintJobElement pje = new PrintJobElement(this, url, "FILE", charset);
+        PrintJobElement pje = new PrintJobElement(this, url, PrintJobElementType.TYPE_FILE, charset);
         rawData.add(pje);
     }
     
     public void appendHTML(ByteArrayBuilder html, Charset charset) {
         type = PrintJobType.TYPE_HTML;
-        PrintJobElement pje = new PrintJobElement(this, html, "HTML", charset);
+        PrintJobElement pje = new PrintJobElement(this, html, PrintJobElementType.TYPE_HTML, charset);
         rawData.add(pje);
     }
     
     public void appendPDF(ByteArrayBuilder url, Charset charset) {
         type = PrintJobType.TYPE_PS;
-        PrintJobElement pje = new PrintJobElement(this, url, "PDF", charset);
+        PrintJobElement pje = new PrintJobElement(this, url, PrintJobElementType.TYPE_PDF, charset);
         rawData.add(pje);
     }
     
@@ -330,7 +330,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                 if (paperSize != null) {
                     attr.add(paperSize.getOrientationRequested());
                     if (paperSize.isAutoSize()) {
-                        if(rawData.get(0).type == "IMAGE_PS") {
+                        if(rawData.get(0).type == PrintJobElementType.TYPE_IMAGE_PS) {
                             paperSize.setAutoSize(rawData.get(0).getBufferedImage());
                         }
                     }
@@ -379,7 +379,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
         if(pageIndex < rawData.size()) {
             PrintJobElement pje = rawData.get(pageIndex);
-            if(pje.type == "IMAGE_PS") {
+            if(pje.type == PrintJobElementType.TYPE_IMAGE_PS) {
                 /* User (0,0) is typically outside the imageable area, so we must
                 * translate by the X and Y values in the PageFormat to avoid clipping
                 */
@@ -398,10 +398,10 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                /* tell the caller that this page is part of the printed document */
                return PAGE_EXISTS;
             }
-            else if(pje.type == "PDF") {
+            else if(pje.type == PrintJobElementType.TYPE_PDF) {
                 return pje.printPDFRenderer(graphics, pageFormat, pageIndex);
             }
-            else if(pje.type == "HTML") {
+            else if(pje.type == PrintJobElementType.TYPE_HTML) {
                 boolean doubleBuffered = super.isDoubleBuffered();
                 super.setDoubleBuffered(false);
 

@@ -58,7 +58,7 @@ public class PrintJobElement {
     
     public int sequence;
     public boolean prepared;
-    public String type;
+    public PrintJobElementType type;
     public PrintJob pj;
     
     private ByteArrayBuilder data;
@@ -72,7 +72,7 @@ public class PrintJobElement {
     private PDFFile pdfFile;
     private ByteBuffer bufferedPDF;
     
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int dotDensity) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, PrintJobElementType type, Charset charset, String lang, int dotDensity) {
         
         this.lang = LanguageType.getType(lang);
         this.dotDensity = dotDensity;
@@ -86,7 +86,7 @@ public class PrintJobElement {
         
     }
 
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String lang, int imageX, int imageY) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, PrintJobElementType type, Charset charset, String lang, int imageX, int imageY) {
         
         this.lang = LanguageType.getType(lang);
         this.imageX = imageX;
@@ -100,7 +100,7 @@ public class PrintJobElement {
         prepared = false;
         
     }
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset, String xmlTag) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, PrintJobElementType type, Charset charset, String xmlTag) {
         
         this.xmlTag = xmlTag;
         
@@ -113,7 +113,7 @@ public class PrintJobElement {
         
     }
 
-    PrintJobElement(PrintJob pj, ByteArrayBuilder data, String type, Charset charset) {
+    PrintJobElement(PrintJob pj, ByteArrayBuilder data, PrintJobElementType type, Charset charset) {
         
         this.pj = pj;
         this.data = data;
@@ -137,7 +137,7 @@ public class PrintJobElement {
 
         // An image file, pull the file into an ImageWrapper and get the 
         // encoded data
-        if(type.equals("IMAGE")) {
+        if(type == PrintJobElementType.TYPE_IMAGE) {
             
             // Prepare the image
             String file = new String(data.getByteArray(), charset.name());
@@ -166,7 +166,7 @@ public class PrintJobElement {
                 LogIt.log(ex);
             }
         }
-        else if(type.equals("IMAGE_PS")) {
+        else if(type == PrintJobElementType.TYPE_IMAGE_PS) {
             String file = new String(data.getByteArray(), charset.name());
             if (ByteUtilities.isBase64Image(file)) {
                 byte[] imgData = Base64.decode(file.split(",")[1]);
@@ -176,7 +176,7 @@ public class PrintJobElement {
                 bufferedImage = ImageIO.read(new URL(file));
             }
         }
-        else if(type.equals("XML")) {
+        else if(type == PrintJobElementType.TYPE_XML) {
             String file = new String(data.getByteArray(), charset.name());
             String dataString;
             byte[] dataByteArray;
@@ -195,11 +195,11 @@ public class PrintJobElement {
                 LogIt.log(ex);
             }
         }
-        else if(type.equals("FILE")) {
+        else if(type == PrintJobElementType.TYPE_FILE) {
             String file = new String(data.getByteArray(), charset.name());
             data = new ByteArrayBuilder(FileUtilities.readRawFile(file));
         }
-        else if(type.equals("PDF")) {
+        else if(type == PrintJobElementType.TYPE_PDF) {
             String file = new String(data.getByteArray(), charset.name());
             bufferedPDF = ByteBuffer.wrap(ByteUtilities.readBinaryFile(file));
             try {
