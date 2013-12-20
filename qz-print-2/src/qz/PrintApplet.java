@@ -29,7 +29,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+import qz.json.JSONArray;
+import qz.json.JSONObject;
 
 /**
  * The PrintApplet is the main component of the Applet
@@ -76,7 +81,8 @@ public class PrintApplet extends Applet {
     }
     
     public String getQueueInfo() {
-        return spooler.getQueueInfo();
+        JSONArray queueInfo = spooler.getQueueInfo();
+        return queueInfo.toString();
     }
     
     public String getJobInfo(int jobIndex) {

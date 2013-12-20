@@ -886,12 +886,12 @@ function updateQueueInfo() {
 	var queueInfo;
 	
 	if (qz) {
-		queueInfo = qz.getQueueInfo();
-		queueArray = queueInfo.split("\n");
+		queueJSON = qz.getQueueInfo();
+		queueInfo = $.parseJSON(queueJSON);
 		queueHtml = "";
 		
-		for(var i=0; i < queueArray.length - 1; i++) {
-			queueHtml += queueArray[i] + " | <a href='javascript:console.log(qz.getJobInfo(" + i + "))'>View Job Info</a><br />";
+		for(var i=0; i < queueInfo.length; i++) {
+			queueHtml += "JOB INFO ID: " + queueInfo[i].id + " TITLE: " + queueInfo[i].title + " STATE: " + queueInfo[i].state + " | <a href='javascript:console.log(qz.getJobInfo(" + queueInfo[i].id + "))'>View Job Info</a><br />";
 		}
 	
 		$('#queueInfo').html(queueHtml);

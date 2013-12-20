@@ -24,6 +24,7 @@ package qz;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ListIterator;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
@@ -31,6 +32,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
 import qz.exception.InvalidFileTypeException;
+import qz.json.JSONArray;
 
 /**
  * The PrintSpooler will maintain a list of all print jobs and their status.
@@ -46,7 +48,7 @@ public class PrintSpooler implements Runnable {
     public PrintJob currentJob;
     public Thread currentJobThread;
     
-    private String queueInfo = "";
+    private JSONArray queueInfo;
     private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
     private Printer currentPrinter;
@@ -85,7 +87,8 @@ public class PrintSpooler implements Runnable {
         while(running) {
             try {
                 
-                queueInfo = "";
+                queueInfo = new JSONArray();
+                
                 spoolIterator = spool.listIterator();
                 
                 if(spool.size() > 0) {
@@ -110,14 +113,13 @@ public class PrintSpooler implements Runnable {
                                 break;
                         };
                         
-                        queueInfo += "Job #" + jobIndex + " Title: " + 
-                                job.getTitle() + " State: " + 
-                                jobState.toString() + "\n";
+                        HashMap<String, String> jobInfo = new HashMap<String, String>();
+                        jobInfo.put("id", String.valueOf(jobIndex));
+                        jobInfo.put("title", job.getTitle());
+                        jobInfo.put("state", jobState.name());
+                        queueInfo.put(jobInfo);
                         
                     }
-                    
-                }
-                else {
                     
                 }
                 
@@ -259,7 +261,7 @@ public class PrintSpooler implements Runnable {
         spool.set(jobIndex, job);
     }
     
-    public String getQueueInfo() {
+    public JSONArray getQueueInfo() {
        return queueInfo;
     }
     
