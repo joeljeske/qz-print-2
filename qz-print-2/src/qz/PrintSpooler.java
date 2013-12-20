@@ -22,10 +22,14 @@
 
 package qz;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -58,6 +62,9 @@ public class PrintSpooler implements Runnable {
     private PaperFormat paperSize;
     private boolean autoSize;
     private boolean logPSFeatures;
+    private String endOfDocument;
+    private int docsPerSpool;
+    private int openJobs;
     
     public void PrintSpooler() {
         
@@ -78,6 +85,9 @@ public class PrintSpooler implements Runnable {
         running = true;
         filePrinter = new FilePrinter();
         logPSFeatures = false;
+        endOfDocument = "";
+        docsPerSpool = 0;
+        openJobs = 0;
         
         // Configurable variables
         loopDelay = 1000;
@@ -135,6 +145,9 @@ public class PrintSpooler implements Runnable {
     }
     
     public void createJob() {
+        
+        openJobs += 1;
+        
         currentJob = new PrintJob();
         currentJobThread = new Thread(currentJob);
         currentJobThread.start();
@@ -194,11 +207,64 @@ public class PrintSpooler implements Runnable {
     }
 
     public void appendFile(ByteArrayBuilder url, Charset charset) {
-        if(currentJob == null) {
-            createJob();
+        
+        if(endOfDocument != "") {
+            
+            String[] fileData = getFileData(url, charset).split(endOfDocument);
+            String[] consolidatedData;
+            
+            if(docsPerSpool > 1) {
+                
+                int dataLength = fileData.length;
+                int newArrayLength = ((dataLength - (dataLength % docsPerSpool)) / docsPerSpool) + 1;
+
+                consolidatedData = new String[newArrayLength];
+                
+                for(int i=0; i < newArrayLength; i++) {
+                    String jobData = "";
+                    for(int j=0; j < docsPerSpool; j++) {
+                        int index = (i * docsPerSpool) + j;
+                        if(index < dataLength) {
+                            jobData += fileData[index] + endOfDocument;
+                        }
+                    }
+                    consolidatedData[i] = jobData;
+                }
+                
+            }
+            else {
+                consolidatedData = new String[fileData.length];
+                
+                for(int i=0; i < fileData.length; i++) {
+                    consolidatedData[i] = fileData[i] + endOfDocument;
+                }
+                
+            }
+            
+            for(String dataString : consolidatedData) {
+                if(currentJob == null) {
+                    createJob();
+                }
+                ByteArrayBuilder bytes = new ByteArrayBuilder();
+                try {
+                    bytes.append(dataString, charset);
+                } catch (UnsupportedEncodingException ex) {
+                    LogIt.log(ex);
+                }
+                currentJob.append(bytes, charset);
+                currentJob = null;
+            }
+            
+            endOfDocument = "";
+            docsPerSpool = 0;
+        }
+        else {
+            if(currentJob == null) {
+                createJob();
+            }
+            currentJob.appendFile(url, charset);
         }
         
-        currentJob.appendFile(url, charset);
     }
     
     public void appendHTML(ByteArrayBuilder html, Charset charset) {
@@ -218,19 +284,32 @@ public class PrintSpooler implements Runnable {
     }
     
     public boolean print() {
-        if(currentJob == null) {
-            LogIt.log("No data has been provided.");
-            return false;
-        }
-        
         if(currentPrinter == null) {
             LogIt.log("No printer specified.");
             return false;
         }
-        currentJob.setPrinter(currentPrinter);
-        currentJob.prepareJob();
-        currentJob = null;
-        return true;
+        
+        if(openJobs == 0) {
+            LogIt.log("No data has been provided.");
+            return false;
+        }
+        else if(openJobs == 1) {
+            currentJob.setPrinter(currentPrinter);
+            currentJob.prepareJob();
+            currentJob = null;
+            openJobs = 0;
+            return true;
+        }
+        else {
+            while(openJobs > 0) {
+                PrintJob job = spool.get(spool.size() - openJobs);
+                job.setPrinter(currentPrinter);
+                job.prepareJob();
+                openJobs -= 1;
+            }
+            currentJob = null;
+            return true;
+        }
     }
     
     public void printToFile(String filePath) {
@@ -373,6 +452,33 @@ public class PrintSpooler implements Runnable {
             currentJob.setLogPostScriptFeatures(logPSFeatures);
         }
         LogIt.log("Console logging of PostScript printing features set to \"" + logPSFeatures + "\"");
+    }
+
+    void setEndOfDocument(String endOfDocument) {
+        this.endOfDocument = endOfDocument;
+        LogIt.log("End of Document set to " + this.endOfDocument);
+    }
+
+    void setDocumentsPerSpool(int docsPerSpool) {
+        this.docsPerSpool = docsPerSpool;
+        LogIt.log("Documents per Spool set to " + this.docsPerSpool);
+    }
+
+    private String getFileData(ByteArrayBuilder url, Charset charset) {
+        
+        String file;
+        String data = null;
+        
+        try {
+            file = new String(url.getByteArray(), charset.name());
+            data = new String(FileUtilities.readRawFile(file), charset.name());
+        } catch (UnsupportedEncodingException ex) {
+            LogIt.log(ex);
+        } catch (IOException ex) {
+            LogIt.log(ex);
+        }
+        
+        return data;
     }
     
 }

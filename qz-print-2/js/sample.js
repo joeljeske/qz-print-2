@@ -453,7 +453,7 @@ function print64() {
 *    qz.setEndOfDocument('P1,1\r\n');
 *    qz.setDocumentsPerSpool('5');
 *    qz.appendFile('/path/to/file.txt');
-*    window['qzDoneAppending'] = function() { qz.print(); };
+*    qz.print();
 ***************************************************************************/     
 function printPages() {
 	if (notReady()) { return; }

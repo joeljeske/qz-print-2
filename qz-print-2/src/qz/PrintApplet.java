@@ -434,6 +434,14 @@ public class PrintApplet extends Applet {
         spooler.setLogPostScriptFeatures(logPSFeatures);
     }
     
+    public void setEndOfDocument(String endOfDocument) {
+        spooler.setEndOfDocument(endOfDocument);
+    }
+    
+    public void setDocumentsPerSpool(int docsPerSpool) {
+        spooler.setDocumentsPerSpool(docsPerSpool);
+    }
+    
     // Deprecated functions
     // TODO: Properly address deprecating these functions
     
