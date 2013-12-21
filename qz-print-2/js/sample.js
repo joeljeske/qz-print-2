@@ -800,24 +800,20 @@ function sendSerialData() {
 		// Send raw commands to the specified port.
 		// W = weight on Mettler Toledo Scale
 		qz.send(document.getElementById("port_name").value, "\nW\n");
+		data = qz.getReturnData();
 		
-		// Automatically called when "qz.send()" is finished waiting for 
-		// a valid message starting with the value supplied for setSerialBegin()
-		// and ending with with the value supplied for setSerialEnd()
-		window['qzSerialReturned'] = function(portName, data) {
-			if (qz.getException()) {
-				alert("Could not send data:\n\t" + qz.getException().getLocalizedMessage());
-				qz.clearException();  
-			} else {
-				if (data == null || data == "") {       // Test for blank data
-					alert("No data was returned.")
-				} else if (data.indexOf("?") !=-1) {    // Test for bad data
-					alert("Device not ready.  Please wait.")
-				} else {                                // Display good data
-					alert("Port [" + portName + "] returned data:\n\t" + data);
-				}
+		if (qz.getException()) {
+			alert("Could not send data:\n\t" + qz.getException().getLocalizedMessage());
+			qz.clearException();  
+		} else {
+			if (data == null || data == "") {       // Test for blank data
+				alert("No data was returned.")
+			} else if (data.indexOf("?") !=-1) {    // Test for bad data
+				alert("Device not ready.  Please wait.")
+			} else {                                // Display good data
+				alert("Port [" + portName + "] returned data:\n\t" + data);
 			}
-		};
+		}
 	}
 }
 

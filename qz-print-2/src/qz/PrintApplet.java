@@ -464,6 +464,47 @@ public class PrintApplet extends Applet {
     public boolean isAlternatePrinting() {
         return spooler.isAlternatePrinting();
     }
+
+    public void findPorts() {
+        spooler.findPorts();
+    }
+    
+    public String getPorts() {
+        return spooler.getPorts();
+    }
+    
+    public void openPort(String portName) {
+        spooler.openPort(portName);
+    }
+    
+    public void closePort(String portName) {
+        spooler.closePort(portName);
+    }
+    
+    public void setSerialBegin(char serialBegin) {
+        spooler.setSerialBegin(serialBegin);
+    }
+    
+    public void setSerialEnd(char serialEnd) {
+        spooler.setSerialEnd(serialEnd);
+    }
+    
+    public void setSerialProperties(int baud, int dataBits, String stopBits, int parity, String flowControl) {
+        setSerialProperties(Integer.toString(baud), Integer.toString(dataBits),
+                stopBits, Integer.toString(parity), flowControl);
+    }
+
+    public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
+        spooler.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
+    }
+    
+    public void send(String serialData) {
+        spooler.sendSerialData(serialData);
+    }
+    
+    public String getReturnData() {
+        return spooler.getReturnData();
+    }
     
     // Deprecated functions
     // TODO: Properly address deprecating these functions

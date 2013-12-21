@@ -64,6 +64,7 @@ public class PrintSpooler implements Runnable {
     private ArrayList<Printer> printerList;
     private String printerListString;
     private FilePrinter filePrinter;
+    private SerialPrinter serialPrinter;
     private PaperFormat paperSize;
     private boolean autoSize;
     private boolean logPSFeatures;
@@ -93,6 +94,7 @@ public class PrintSpooler implements Runnable {
         // Initialize system variables
         running = true;
         filePrinter = new FilePrinter();
+        serialPrinter = new SerialPrinter();
         logPSFeatures = false;
         endOfDocument = "";
         docsPerSpool = 0;
@@ -547,6 +549,42 @@ public class PrintSpooler implements Runnable {
     
     public boolean isAlternatePrinting() {
         return alternatePrint;
+    }
+
+    public void findPorts() {
+        serialPrinter.findPorts();
+    }
+
+    public String getPorts() {
+        return serialPrinter.getPorts();
+    }
+
+    public void openPort(String portName) {
+        serialPrinter.openPort(portName);
+    }
+
+    public void closePort(String portName) {
+        serialPrinter.closePort(portName);
+    }
+
+    public void setSerialBegin(char serialBegin) {
+        serialPrinter.setSerialBegin(serialBegin);
+    }
+
+    public void setSerialEnd(char serialEnd) {
+        serialPrinter.setSerialEnd(serialEnd);
+    }
+
+    public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
+        serialPrinter.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
+    }
+
+    public void sendSerialData(String serialData) {
+        serialPrinter.send(serialData);
+    }
+
+    public String getReturnData() {
+        return serialPrinter.getReturnData();
     }
     
 }
