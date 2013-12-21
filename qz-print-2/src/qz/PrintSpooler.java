@@ -73,6 +73,7 @@ public class PrintSpooler implements Runnable {
     private NetworkUtilities networkUtilities;
     private String macAddress;
     private String ipAddress;
+    private boolean alternatePrint;
     
     public void PrintSpooler() {
         
@@ -96,6 +97,7 @@ public class PrintSpooler implements Runnable {
         endOfDocument = "";
         docsPerSpool = 0;
         openJobs = 0;
+        alternatePrint = false;
         
         // Configurable variables
         loopDelay = 1000;
@@ -168,6 +170,7 @@ public class PrintSpooler implements Runnable {
         }
         
         currentJob.setLogPostScriptFeatures(logPSFeatures);
+        currentJob.setAlternatePrinting(alternatePrint);
         
         spool.add(currentJob);
     }
@@ -491,7 +494,7 @@ public class PrintSpooler implements Runnable {
         return data;
     }
 
-    void findNetworkInfo() {
+    public void findNetworkInfo() {
         
         if(networkUtilities == null) {
             try {
@@ -505,7 +508,7 @@ public class PrintSpooler implements Runnable {
             }
         }
         
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 try {
                     networkUtilities.gatherNetworkInfo();
@@ -524,12 +527,26 @@ public class PrintSpooler implements Runnable {
 
     }
 
-    String getMac() {
+    public String getMac() {
         return macAddress;
     }
 
-    String getIP() {
+    public String getIP() {
         return ipAddress;
+    }
+    
+    public void useAlternatePrinting(boolean alternatePrint) {
+        this.alternatePrint = alternatePrint;
+        
+        if(currentJob != null) {
+            currentJob.setAlternatePrinting(alternatePrint);
+        }
+        
+        LogIt.log("Alternate printing set to " + alternatePrint);
+    }
+    
+    public boolean isAlternatePrinting() {
+        return alternatePrint;
     }
     
 }

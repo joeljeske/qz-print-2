@@ -52,10 +52,14 @@ public class PSPrinter implements Printer {
         return name;
     }
 
-    public void printRaw(ByteArrayBuilder data) throws PrinterException {
+    public void printRaw(ByteArrayBuilder data) throws PrintException {
         LogIt.log("Cannot print raw job to PostScript printer.");
     }
 
+    public void printAlternate(ByteArrayBuilder data) throws PrintException {
+        LogIt.log("Cannot use alternate printing on a PostScript printer.");
+    }
+        
     public boolean ready() {
         return true;
     }

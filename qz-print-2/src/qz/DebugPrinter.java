@@ -22,6 +22,7 @@
 package qz;
 
 import java.awt.print.PrinterException;
+import javax.print.PrintException;
 import javax.print.PrintService;
 
 /**
@@ -38,8 +39,12 @@ public class DebugPrinter implements Printer {
         return name;
     }
 
-    public void printRaw(ByteArrayBuilder data) throws PrinterException {
+    public void printRaw(ByteArrayBuilder data) throws PrintException {
         LogIt.log("DebugPrinter printing:\n" + new String(data.getByteArray()));
+    }
+    
+    public void printAlternate(ByteArrayBuilder data) throws PrintException {
+        LogIt.log("DebugPrinter alternate printing:\n" + new String(data.getByteArray()));
     }
 
     public boolean ready() {

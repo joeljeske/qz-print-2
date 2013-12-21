@@ -22,8 +22,11 @@
 package qz;
 
 import java.awt.print.PrinterException;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Locale;
 import javax.print.DocFlavor;
@@ -56,7 +59,7 @@ public class RawPrinter implements Printer {
         return name;
     }
 
-    public void printRaw(ByteArrayBuilder data) throws PrinterException {
+    public void printRaw(ByteArrayBuilder data) throws PrintException {
         
         SimpleDoc doc = new SimpleDoc(data.getByteArray(), docFlavor, docAttr);
         
@@ -118,6 +121,27 @@ public class RawPrinter implements Printer {
         LogIt.log("Print job received by printer: \"" + ps.getName() + "\"");
     }
 
+    public void printAlternate(ByteArrayBuilder data) throws PrintException {
+        File tmpFile = new File("/tmp/qz-spool-" + System.currentTimeMillis());
+        FilePrinter filePrinter = new FilePrinter();
+        
+        try {
+            filePrinter.setOutputPath(tmpFile.getAbsolutePath());
+            filePrinter.printRaw(data);
+            
+            String shellCmd = "/usr/bin/lp -d \"" + ps.getName()
+                    + "\" -o raw \"" + tmpFile.getAbsolutePath() + "\";";
+            LogIt.log("Runtime Exec running: " + shellCmd);
+            Process pr = Runtime.getRuntime().exec(new String[]{"bash", "-c", shellCmd});
+            pr.waitFor();
+            processStream(pr);
+        } catch (Throwable t) {
+            throw new PrintException(t.getLocalizedMessage());
+        } finally {
+            tmpFile.delete();
+        }
+    }
+    
     public void printToHost(ByteArrayBuilder data, String jobHost, int jobPort) {
         LogIt.log("Printing to host " + jobHost + ":" + jobPort);
         
@@ -156,4 +180,22 @@ public class RawPrinter implements Printer {
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
+    
+    private void processStream(Process pr) throws Throwable {
+        BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String tmp;
+        String output = "";
+        while ((tmp = buf.readLine()) != null) {
+            if (output.length() == 0) {
+                output = tmp;
+            } else {
+                output = output.concat("\n" + tmp);
+            }
+        }
+        LogIt.log("Runtime Exec returned: " + output);
+        if (pr.exitValue() != 0) {
+            throw new PrintException("Alternate printing returned a non-zero value (" + pr.exitValue() + "). " + output);
+        }
+    }
+    
 }

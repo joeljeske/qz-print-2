@@ -42,6 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
+import javax.print.PrintException;
 import javax.print.SimpleDoc;
 import javax.print.attribute.Attribute;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -76,7 +77,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     private int jobPort;
     private boolean logPSFeatures;
     private boolean autoSize;
-
+    private boolean alternatePrint;
+    
     public void run() {
         
         this.autoSize = false;
@@ -241,11 +243,13 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                     RawPrinter rawPrinter = (RawPrinter)printer;
                     rawPrinter.printToHost(jobData, jobHost, jobPort);
                 }
+                else if(alternatePrint) {
+                    printer.printAlternate(jobData);
+                }
                 else {
                     printer.printRaw(jobData);
                 }
-            }
-            catch(PrinterException ex) {
+            } catch (PrintException ex) {
                 LogIt.log(ex);
             }
         }
@@ -451,6 +455,10 @@ public class PrintJob extends JLabel implements Runnable, Printable {
 
     void setLogPostScriptFeatures(boolean logPSFeatures) {
         this.logPSFeatures = logPSFeatures;
+    }
+    
+    void setAlternatePrinting(boolean alternatePrint) {
+        this.alternatePrint = alternatePrint;
     }
     
 }

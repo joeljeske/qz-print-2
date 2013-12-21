@@ -25,6 +25,7 @@ import java.awt.print.PrinterException;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import javax.print.PrintException;
 import javax.print.PrintService;
 import qz.exception.InvalidFileTypeException;
 
@@ -73,7 +74,7 @@ public class FilePrinter implements Printer {
         return "FILE";
     }
 
-    public void printRaw(ByteArrayBuilder data) throws PrinterException {
+    public void printRaw(ByteArrayBuilder data) throws PrintException {
         LogIt.log("Printing to file: " + outputPath);
         
         try {
@@ -88,6 +89,10 @@ public class FilePrinter implements Printer {
         
     }
 
+    public void printAlternate(ByteArrayBuilder data) throws PrintException {
+        LogIt.log("Cannot use alternate printing on a File printer.");
+    }
+
     // Empty function. FilePrinter's should never have a ps set
     public void setPrintService(PrintService ps) {
         
@@ -100,5 +105,5 @@ public class FilePrinter implements Printer {
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }
-    
+
 }

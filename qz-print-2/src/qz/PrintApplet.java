@@ -453,6 +453,18 @@ public class PrintApplet extends Applet {
         return spooler.getIP();
     }
     
+    public void useAlternatePrinting() {
+        this.useAlternatePrinting(true);
+    }
+
+    public void useAlternatePrinting(boolean alternatePrint) {
+        spooler.useAlternatePrinting(alternatePrint);
+    }
+    
+    public boolean isAlternatePrinting() {
+        return spooler.isAlternatePrinting();
+    }
+    
     // Deprecated functions
     // TODO: Properly address deprecating these functions
     

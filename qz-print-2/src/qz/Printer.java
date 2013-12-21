@@ -21,7 +21,7 @@
  */
 package qz;
 
-import java.awt.print.PrinterException;
+import javax.print.PrintException;
 import javax.print.PrintService;
 
 /**
@@ -36,8 +36,12 @@ public interface Printer {
     public abstract String getName();
     
     // This function sends raw data to a Raw type printer
-    public abstract void printRaw(ByteArrayBuilder data) throws PrinterException;
+    public abstract void printRaw(ByteArrayBuilder data) throws PrintException;
 
+    // This function sends raw data to a Raw type printer using an alternate
+    // approach designed to work with *nix style printing (CUPS)
+    public void printAlternate(ByteArrayBuilder data) throws PrintException;
+    
     /**
      * Returns a boolean value based on whether the printer is ready to accept 
      * a job
@@ -74,5 +78,7 @@ public interface Printer {
     public abstract void setName(String name);
     
     public abstract void setJobTitle(String jobTitle);
+
+    
     
 }
