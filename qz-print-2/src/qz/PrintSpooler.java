@@ -24,7 +24,11 @@ package qz;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -37,6 +41,7 @@ import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
 import qz.exception.InvalidFileTypeException;
 import qz.json.JSONArray;
+import qz.reflection.ReflectException;
 
 /**
  * The PrintSpooler will maintain a list of all print jobs and their status.
@@ -65,6 +70,9 @@ public class PrintSpooler implements Runnable {
     private String endOfDocument;
     private int docsPerSpool;
     private int openJobs;
+    private NetworkUtilities networkUtilities;
+    private String macAddress;
+    private String ipAddress;
     
     public void PrintSpooler() {
         
@@ -350,7 +358,9 @@ public class PrintSpooler implements Runnable {
     
     public String getJobInfo(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
-        return job.getInfo();
+        String jobInfo = job.getInfo();
+        LogIt.log("Job Data: " + jobInfo);
+        return jobInfo;
     }
 
     public void findAllPrinters() {
@@ -479,6 +489,47 @@ public class PrintSpooler implements Runnable {
         }
         
         return data;
+    }
+
+    void findNetworkInfo() {
+        
+        if(networkUtilities == null) {
+            try {
+                networkUtilities = new NetworkUtilities();
+            } catch (SocketException ex) {
+                LogIt.log(ex);
+            } catch (ReflectException ex) {
+                LogIt.log(ex);
+            } catch (UnknownHostException ex) {
+                LogIt.log(ex);
+            }
+        }
+        
+        AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                try {
+                    networkUtilities.gatherNetworkInfo();
+                } catch (IOException ex) {
+                    LogIt.log(ex);
+                } catch (ReflectException ex) {
+                    LogIt.log(ex);
+                }
+                return null;
+            }
+        });
+
+        macAddress = networkUtilities.getHardwareAddress();
+        ipAddress = networkUtilities.getInetAddress();
+        LogIt.log("Found Network Adapter. MAC: " + macAddress + " IP: " + ipAddress);
+
+    }
+
+    String getMac() {
+        return macAddress;
+    }
+
+    String getIP() {
+        return ipAddress;
     }
     
 }

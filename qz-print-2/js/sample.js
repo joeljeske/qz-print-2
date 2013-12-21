@@ -626,8 +626,7 @@ function printHTML() {
 * Prototype function for getting the primary IP or Mac address of a computer
 * Usage:
 *    qz.findNetworkInfo();
-*    window['qzDoneFindingNetwork'] = function() {alert(qz.getMac() + ',' +
-*       qz.getIP()); };
+*    alert(qz.getMac() + ',' + qz.getIP());
 ***************************************************************************/ 
 function listNetworkInfo() {
 	if (isLoaded()) {
@@ -636,14 +635,7 @@ function listNetworkInfo() {
 		// qz.getNetworkUtilities().setHostname("qzindustries.com");
 		// qz.getNetworkUtilities().setPort(80);
 		qz.findNetworkInfo();
-		
-		// Automatically gets called when "qz.findPrinter()" is finished.
-		window['qzDoneFindingNetwork'] = function() {
-			alert("Primary adapter found: " + qz.getMac() + ", IP: " + qz.getIP());
-			
-			// Remove reference to this function
-			window['qzDoneFindingNetwork'] = null;
-		};
+		alert("Primary adapter found: " + qz.getMac() + ", IP: " + qz.getIP());
 	}
 }
 
