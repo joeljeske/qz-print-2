@@ -417,7 +417,7 @@ public class PrintSpooler implements Runnable {
                 }
             }
             else {
-                if(printer.getName().indexOf(printerName) != -1) {
+                if(printer.getName().toLowerCase().indexOf(printerName.toLowerCase()) != -1) {
                     currentPrinter = printer;
                     break;
                 }
