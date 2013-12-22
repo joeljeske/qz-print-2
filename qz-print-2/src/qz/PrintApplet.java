@@ -467,6 +467,7 @@ public class PrintApplet extends Applet {
 
     public void findPorts() {
         spooler.findPorts();
+        btools.notifyBrowser("qzDoneFindingPorts");
     }
     
     public String getPorts() {

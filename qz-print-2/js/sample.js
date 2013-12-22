@@ -714,8 +714,6 @@ function useAlternatePrinting() {
 ***************************************************************************/ 
 function listSerialPorts() {
 	if (isLoaded()) {
-		// Search the PC for communication (RS232, COM, tty) ports
-		qz.findPorts();
 		
 		// Automatically called when "qz.findPorts()" is finished
 		window['qzDoneFindingPorts'] = function() {
@@ -729,6 +727,10 @@ function listSerialPorts() {
 			// Remove reference to this function
 			window['qzDoneFindingPorts'] = null;
 		};
+		
+		// Search the PC for communication (RS232, COM, tty) ports
+		qz.findPorts();
+		
 	}
 }
 

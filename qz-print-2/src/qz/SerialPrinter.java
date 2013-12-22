@@ -21,6 +21,7 @@
  */
 package qz;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import javax.print.PrintException;
@@ -117,19 +118,14 @@ public class SerialPrinter implements Printer {
     public void findPorts() {
         
         LogIt.log("Serial Printer now finding ports.");
-        serialPorts = AccessController.doPrivileged(new PrivilegedAction<String>() {
-            public String run() {
-                StringBuilder sb = new StringBuilder();
-                String[] portArray = SerialPortList.getPortNames();
-                for (int i = 0; i < portArray.length; i++) {
-                    sb.append(portArray[i]).append(i < portArray.length - 1 ? "," : "");
-                }
-                String serialPorts = sb.toString();
-                LogIt.log("Found Serial Ports: " + serialPorts);
-                return serialPorts;
+        
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                fetchPortList();
+                return null;
             }
         });
-        
+ 
     }
 
     public String getPorts() {
@@ -173,4 +169,22 @@ public class SerialPrinter implements Printer {
         this.timeout = timeout;
     }
     
+    public void fetchPortList() {
+        try {
+            StringBuilder sb = new StringBuilder();
+            portArray = SerialPortList.getPortNames();
+            for (int i = 0; i < portArray.length; i++) {
+                sb.append(portArray[i]).append(i < portArray.length - 1 ? "," : "");
+            }
+            serialPorts = sb.toString();
+            LogIt.log("Found Serial Ports: " + serialPorts);
+        }
+        catch (NullPointerException ex) {
+            LogIt.log("NullPointerException: " + ex);
+        }
+        catch (NoClassDefFoundError ex) {
+            LogIt.log("NoClassDefFoundError: " + ex);
+        }
+        
+    }
 }
