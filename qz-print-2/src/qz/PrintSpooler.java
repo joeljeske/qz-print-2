@@ -22,6 +22,7 @@
 
 package qz;
 
+import java.applet.Applet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
@@ -75,9 +76,10 @@ public class PrintSpooler implements Runnable {
     private String macAddress;
     private String ipAddress;
     private boolean alternatePrint;
+    private Applet applet;
     
     public void PrintSpooler() {
-        
+
     }
     
     // The run loop will consistently check the spool List and call functions
@@ -94,7 +96,6 @@ public class PrintSpooler implements Runnable {
         // Initialize system variables
         running = true;
         filePrinter = new FilePrinter();
-        serialPrinter = new SerialPrinter();
         logPSFeatures = false;
         endOfDocument = "";
         docsPerSpool = 0;
@@ -154,6 +155,11 @@ public class PrintSpooler implements Runnable {
                 running = false;
             }
         }
+    }
+    
+    public void setApplet(Applet applet) {
+        this.applet = applet;
+        serialPrinter = new SerialPrinter(applet);
     }
     
     public void createJob() {

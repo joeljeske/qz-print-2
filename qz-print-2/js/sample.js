@@ -744,9 +744,7 @@ function listSerialPorts() {
 ***************************************************************************/ 
 function openSerialPort() {
 	if (isLoaded()) {
-		qz.openPort(document.getElementById("port_name").value);
-	
-		// Automatically called when "qz.openPort()" is finished (even if it fails to open)
+	// Automatically called when "qz.openPort()" is finished (even if it fails to open)
 		window['qzDoneOpeningPort'] = function(portName) {
 			if (qz.getException()) {
 				alert("Could not open port [" + portName + "] \n\t" + 
@@ -756,6 +754,8 @@ function openSerialPort() {
 				alert("Port [" + portName +  "] is open!");
 			}
 		};
+		
+		qz.openPort(document.getElementById("port_name").value);
 	}
 }
 
@@ -767,8 +767,6 @@ function openSerialPort() {
 ***************************************************************************/ 
 function closeSerialPort() {
 	if (isLoaded()) {
-		qz.closePort(document.getElementById("port_name").value);
-		
 		// Automatically called when "qz.closePort() is finished (even if it fails to close)
 		window['qzDoneClosingPort'] = function(portName) {
 			if (qz.getException()) {
@@ -779,9 +777,10 @@ function closeSerialPort() {
 				alert("Port [" + portName +  "] closed!");
 			}
 		};
+		
+		qz.closePort(document.getElementById("port_name").value);
 	}
 }
-
 
 /***************************************************************************
 * Prototype function to send data to the open port
@@ -817,6 +816,13 @@ function sendSerialData() {
 			}
 		}
 	}
+}
+
+/***************************************************************************
+* This function is called when serial data is sent from the port.
+***************************************************************************/ 
+function qzSerialReturned(returnData) {
+	alert("Received Serial Data: " + returnData);
 }
 
 /***************************************************************************

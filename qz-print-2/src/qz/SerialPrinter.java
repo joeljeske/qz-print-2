@@ -21,6 +21,7 @@
  */
 package qz;
 
+import java.applet.Applet;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;
@@ -66,16 +67,19 @@ public class SerialPrinter implements Printer {
     private String serialPorts;
     private String[] portArray;
     private String portName;
-    
+    private Applet applet;
+    private BrowserTools btools;
     private boolean ready;
 
-    public SerialPrinter() {
+    public SerialPrinter(Applet applet) {
         //port = new SerialPort(portName);
         this.baudRate = SerialPort.BAUDRATE_9600;
         this.dataBits = SerialPort.DATABITS_8;
         this.stopBits = SerialPort.STOPBITS_1;
         this.flowControl = SerialPort.FLOWCONTROL_NONE;
         this.parity = SerialPort.PARITY_NONE;
+        this.applet = applet;
+        this.btools = new BrowserTools(applet);
         this.ready = true;
         setTimeout(1200);
     }
@@ -116,7 +120,7 @@ public class SerialPrinter implements Printer {
     public void setJobTitle(String jobTitle) {
         
     }
-
+    
     public void findPorts() {
         
         LogIt.log("Serial Printer now finding ports.");
@@ -137,15 +141,13 @@ public class SerialPrinter implements Printer {
     public boolean openPort(String portName) {
         if (port == null) {
             port = new SerialPort(this.portName = portName);
+            
+            // Use a privileged action to open the port
             AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     try {
                         port.openPort();
-                        port.addEventListener(new SerialPortEventListener() {
-                            public void serialEvent(SerialPortEvent spe) {
-                                SerialPrinter.this.serialEvent(spe);
-                            }
-                        });
+                        
                     } catch (SerialPortException ex) {
                         port = null;
                         LogIt.log(ex);
@@ -154,12 +156,23 @@ public class SerialPrinter implements Printer {
                 }
             });
             
+            // Add a listener to the port to check for incoming data
+            try {
+                port.addEventListener(new SerialPortEventListener() {
+                    public void serialEvent(SerialPortEvent spe) {
+                        serialEventListener(spe);
+                    }
+                });
+            } catch (SerialPortException ex) {
+                LogIt.log(ex);
+            }
+            
             this.portName = portName;
             LogIt.log("Opened Serial Port " + this.portName);
-            
         } else {
             LogIt.log(Level.WARNING, "Serial Port [" + this.portName + "] already appears to be open.");
         }
+        this.btools.notifyBrowser("qzDoneOpeningPort", portName);
         return port.isOpened();
     }
 
@@ -181,6 +194,7 @@ public class SerialPrinter implements Printer {
         } else {
             LogIt.log("Port [" + portName + "] closed successfully.");
         }
+        btools.notifyBrowser("qzDoneClosingPort", portName);
         port = null;
         this.portName = null;
         return closed;
@@ -266,7 +280,7 @@ public class SerialPrinter implements Printer {
         }
     }
 
-    public void serialEvent(SerialPortEvent event) {
+    public void serialEventListener(SerialPortEvent event) {
         try {
             // Receive data
             if (event.isRXCHAR()) {
@@ -284,12 +298,16 @@ public class SerialPrinter implements Printer {
                     getOutputBuffer().clear();
                 }
                 LogIt.log("Received Serial Data: " + output);
+                if(output != null) {
+                    btools.notifyBrowser("qzSerialReturned", new String(output));
+                }
             }
         } catch (SerialPortException e) {
             LogIt.log(Level.SEVERE, "Exception occured while reading data from port.", e);
         } catch (SerialPortTimeoutException e) {
             LogIt.log(Level.WARNING, "Timeout occured waiting for port to respond.  Timeout value: " + timeout, e);
         }
+        
     }
     
     public ByteArrayBuilder getInputBuffer() {

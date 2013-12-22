@@ -63,6 +63,8 @@ public class PrintApplet extends Applet {
         
         btools = new BrowserTools(this);
         spooler = new PrintSpooler();
+        spooler.setApplet(this);
+        
         new Thread(spooler).start();
         
         charset = Charset.defaultCharset();
