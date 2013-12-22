@@ -147,7 +147,6 @@ public class SerialPrinter implements Printer {
                 public Object run() {
                     try {
                         port.openPort();
-                        
                     } catch (SerialPortException ex) {
                         port = null;
                         LogIt.log(ex);
@@ -297,9 +296,13 @@ public class SerialPrinter implements Printer {
                     System.arraycopy(getOutputBuffer().getByteArray(), _begin, output, 0, _end - _begin);
                     getOutputBuffer().clear();
                 }
-                LogIt.log("Received Serial Data: " + output);
+                
                 if(output != null) {
+                    LogIt.log("Received Serial Data: " + new String(output));
                     btools.notifyBrowser("qzSerialReturned", new String(output));
+                }
+                else {
+                    LogIt.log("Received serial data but it was null. Please check the begin and end characters.");
                 }
             }
         } catch (SerialPortException e) {
