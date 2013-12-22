@@ -80,8 +80,14 @@ public class PrintApplet extends Applet {
     }
     
     public String getQueueInfo() {
-        JSONArray queueInfo = spooler.getQueueInfo();
-        return queueInfo.toString();
+        try {
+            JSONArray queueInfo = spooler.getQueueInfo();
+            return queueInfo.toString();
+        }
+        catch (NullPointerException ex) {
+            LogIt.log(ex);
+            return "";
+        }
     }
     
     public String getJobInfo(int jobIndex) {
@@ -482,12 +488,14 @@ public class PrintApplet extends Applet {
         spooler.closePort(portName);
     }
     
-    public void setSerialBegin(char serialBegin) {
-        spooler.setSerialBegin(serialBegin);
+    public void setSerialBegin(String serialBegin) {
+        ByteArrayBuilder serialBeginBytes = new ByteArrayBuilder(serialBegin.getBytes());
+        spooler.setSerialBegin(serialBeginBytes);
     }
     
-    public void setSerialEnd(char serialEnd) {
-        spooler.setSerialEnd(serialEnd);
+    public void setSerialEnd(String serialEnd) {
+        ByteArrayBuilder serialEndBytes = new ByteArrayBuilder(serialEnd.getBytes());
+        spooler.setSerialEnd(serialEndBytes);
     }
     
     public void setSerialProperties(int baud, int dataBits, String stopBits, int parity, String flowControl) {
@@ -499,7 +507,8 @@ public class PrintApplet extends Applet {
         spooler.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
     }
     
-    public void send(String serialData) {
+    public void send(String portName, String serialData) {
+        // portName is only used for display. Get current port name from SerialPrinter
         spooler.sendSerialData(serialData);
     }
     

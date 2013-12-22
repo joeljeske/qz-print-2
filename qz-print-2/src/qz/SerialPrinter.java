@@ -21,9 +21,10 @@
  */
 package qz;
 
-import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.print.PrintException;
 import javax.print.PrintService;
 import jssc.SerialPort;
@@ -31,6 +32,7 @@ import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import jssc.SerialPortTimeoutException;
 
 /**
  *
@@ -132,32 +134,109 @@ public class SerialPrinter implements Printer {
         return serialPorts;
     }
 
-    public void openPort(String portName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean openPort(String portName) {
+        if (port == null) {
+            port = new SerialPort(this.portName = portName);
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    try {
+                        port.openPort();
+                        port.addEventListener(new SerialPortEventListener() {
+                            public void serialEvent(SerialPortEvent spe) {
+                                SerialPrinter.this.serialEvent(spe);
+                            }
+                        });
+                    } catch (SerialPortException ex) {
+                        port = null;
+                        LogIt.log(ex);
+                    }
+                    return null;
+                }
+            });
+            
+            this.portName = portName;
+            LogIt.log("Opened Serial Port " + this.portName);
+            
+        } else {
+            LogIt.log(Level.WARNING, "Serial Port [" + this.portName + "] already appears to be open.");
+        }
+        return port.isOpened();
     }
 
-    public void closePort(String portName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean closePort(String portName) {
+        if (port == null || !port.isOpened()) {
+            LogIt.log(Level.WARNING, "Serial Port [" + portName + "] does not appear to be open.");
+            return false;
+        }
+        
+        boolean closed = false;
+        try {
+            closed = port.closePort();
+        } catch (SerialPortException ex) {
+            LogIt.log(ex);
+        }
+        
+        if (!closed) {
+            LogIt.log(Level.WARNING, "Serial Port [" + portName + "] was not closed properly.");
+        } else {
+            LogIt.log("Port [" + portName + "] closed successfully.");
+        }
+        port = null;
+        this.portName = null;
+        return closed;
     }
 
-    public void setSerialBegin(char serialBegin) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setSerialBegin(ByteArrayBuilder serialBegin) {
+        this.begin = serialBegin.getByteArray();
     }
 
-    public void setSerialEnd(char serialEnd) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setSerialEnd(ByteArrayBuilder serialEnd) {
+        this.end = serialEnd.getByteArray();
     }
 
     public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.baudRate = SerialUtilities.parseBaudRate(baud);
+        this.dataBits = SerialUtilities.parseDataBits(dataBits);
+        this.stopBits = SerialUtilities.parseStopBits(stopBits);
+        this.parity = SerialUtilities.parseParity(parity);
+        this.flowControl = SerialUtilities.parseFlowControl(flowControl);
     }
 
+    // TODO: Finish this function and figure out how to get serialData set so that
+    // it sends properly.
     public void send(String serialData) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(port != null) {
+            inputBuffer = getInputBuffer();
+            inputBuffer.append(serialData.getBytes());
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    try {
+                        port.setParams(baudRate, dataBits, stopBits, parity);
+                        port.setFlowControlMode(flowControl);
+                        LogIt.log("Sending data to [" + portName + "]:\r\n\r\n" + new String(getInputBuffer().getByteArray()) + "\r\n\r\n");
+                        port.writeBytes(getInputBuffer().getByteArray());
+                        getInputBuffer().clear();
+                    } catch (SerialPortException ex) {
+                        LogIt.log(ex);
+                    }
+                    return null;
+                }
+            });
+        }
+        else {
+            LogIt.log("Error. Serial port not opened.");
+        }
     }
 
     public String getReturnData() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(output != null) {
+            String returnData = new String(output);
+            output = null;
+            return returnData;
+        }
+        else {
+            return null;
+        }
     }
     
     /**
@@ -185,6 +264,45 @@ public class SerialPrinter implements Printer {
         catch (NoClassDefFoundError ex) {
             LogIt.log("NoClassDefFoundError: " + ex);
         }
-        
+    }
+
+    public void serialEvent(SerialPortEvent event) {
+        try {
+            // Receive data
+            if (event.isRXCHAR()) {
+                getOutputBuffer().append(port.readBytes(event.getEventValue(), timeout));
+                
+                int[] beginPos = ByteUtilities.indicesOfSublist(getOutputBuffer().getByteArray(), begin);
+                int[] endPos = ByteUtilities.indicesOfSublist(getOutputBuffer().getByteArray(), end);
+                if (beginPos.length > 0 && endPos.length > 0) {
+                    int _begin = beginPos[beginPos.length -1];
+                    int _end  = endPos[endPos.length -1];
+                    // TODO:  Use specified charset in PrintApplet.
+                    LogIt.log(new String(getOutputBuffer().getByteArray(), _begin, _end - _begin));
+                    output = new byte[_end - _begin];
+                    System.arraycopy(getOutputBuffer().getByteArray(), _begin, output, 0, _end - _begin);
+                    getOutputBuffer().clear();
+                }
+                LogIt.log("Received Serial Data: " + output);
+            }
+        } catch (SerialPortException e) {
+            LogIt.log(Level.SEVERE, "Exception occured while reading data from port.", e);
+        } catch (SerialPortTimeoutException e) {
+            LogIt.log(Level.WARNING, "Timeout occured waiting for port to respond.  Timeout value: " + timeout, e);
+        }
+    }
+    
+    public ByteArrayBuilder getInputBuffer() {
+        if (this.inputBuffer == null) {
+            this.inputBuffer = new ByteArrayBuilder();
+        }
+        return this.inputBuffer;
+    }
+    
+    private ByteArrayBuilder getOutputBuffer() {
+        if (this.outputBuffer == null) {
+            this.outputBuffer = new ByteArrayBuilder();
+        }
+        return this.outputBuffer;
     }
 }

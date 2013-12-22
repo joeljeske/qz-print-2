@@ -358,7 +358,7 @@ public class PrintSpooler implements Runnable {
     }
     
     public JSONArray getQueueInfo() {
-       return queueInfo;
+        return queueInfo;
     }
     
     public String getJobInfo(int jobIndex) {
@@ -567,11 +567,11 @@ public class PrintSpooler implements Runnable {
         serialPrinter.closePort(portName);
     }
 
-    public void setSerialBegin(char serialBegin) {
+    public void setSerialBegin(ByteArrayBuilder serialBegin) {
         serialPrinter.setSerialBegin(serialBegin);
     }
 
-    public void setSerialEnd(char serialEnd) {
+    public void setSerialEnd(ByteArrayBuilder serialEnd) {
         serialPrinter.setSerialEnd(serialEnd);
     }
 
