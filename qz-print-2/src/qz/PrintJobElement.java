@@ -123,7 +123,7 @@ public class PrintJobElement {
         prepared = false;
     }
     
-    public boolean prepare() throws IOException {
+    public boolean prepare() throws IOException, InvalidRawImageException, NullCommandException {
 
         //TODO: Add prepare code for all types
         /*
@@ -160,8 +160,6 @@ public class PrintJobElement {
             
             try {
                 this.data = new ByteArrayBuilder(iw.getImageCommand());
-            } catch (InvalidRawImageException ex) {
-                LogIt.log(ex);
             } catch (UnsupportedEncodingException ex) {
                 LogIt.log(ex);
             }
@@ -186,8 +184,6 @@ public class PrintJobElement {
                 dataByteArray = Base64.decode(dataString);
                 data = new ByteArrayBuilder(dataByteArray);
             } catch (DOMException ex) {
-                LogIt.log(ex);
-            } catch (NullCommandException ex) {
                 LogIt.log(ex);
             } catch (ParserConfigurationException ex) {
                 LogIt.log(ex);

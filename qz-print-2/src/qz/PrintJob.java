@@ -53,6 +53,8 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import qz.exception.InvalidRawImageException;
+import qz.exception.NullCommandException;
 
 /**
  * PrintJob will provide an object to hold an entire job. It should contain the 
@@ -168,7 +170,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
         rawData.add(pje);
     }
     
-    public void prepareJob() {
+    public void prepareJob() throws InvalidRawImageException, NullCommandException {
         
         state = PrintJobState.STATE_PROCESSING;
         

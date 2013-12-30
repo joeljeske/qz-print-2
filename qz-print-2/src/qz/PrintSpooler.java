@@ -41,6 +41,8 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.PrinterName;
 import qz.exception.InvalidFileTypeException;
+import qz.exception.InvalidRawImageException;
+import qz.exception.NullCommandException;
 import qz.json.JSONArray;
 import qz.reflection.ReflectException;
 
@@ -77,6 +79,7 @@ public class PrintSpooler implements Runnable {
     private String ipAddress;
     private boolean alternatePrint;
     private Applet applet;
+    private Throwable exception;
     
     public void PrintSpooler() {
 
@@ -101,6 +104,7 @@ public class PrintSpooler implements Runnable {
         docsPerSpool = 0;
         openJobs = 0;
         alternatePrint = false;
+        exception = null;
         
         // Configurable variables
         loopDelay = 1000;
@@ -314,7 +318,17 @@ public class PrintSpooler implements Runnable {
         }
         else if(openJobs == 1) {
             currentJob.setPrinter(currentPrinter);
-            currentJob.prepareJob();
+            try {
+                currentJob.prepareJob();
+            }
+            catch (InvalidRawImageException ex) {
+                LogIt.log(ex);
+                setException(ex);
+            }
+            catch (NullCommandException ex) {
+                LogIt.log(ex);
+                setException(ex);
+            }
             currentJob = null;
             openJobs = 0;
             return true;
@@ -323,7 +337,17 @@ public class PrintSpooler implements Runnable {
             while(openJobs > 0) {
                 PrintJob job = spool.get(spool.size() - openJobs);
                 job.setPrinter(currentPrinter);
-                job.prepareJob();
+                try {
+                    job.prepareJob();
+                }
+                catch (InvalidRawImageException ex) {
+                    LogIt.log(ex);
+                    setException(ex);
+                }
+                catch (NullCommandException ex) {
+                    LogIt.log(ex);
+                    setException(ex);
+                }
                 openJobs -= 1;
             }
             currentJob = null;
@@ -333,16 +357,20 @@ public class PrintSpooler implements Runnable {
     
     public void printToFile(String filePath) {
         if(currentJob != null) {
-            
             try {
                 filePrinter.setOutputPath(filePath);
+                currentJob.setPrinter(filePrinter);
+                currentJob.prepareJob();
+            } catch (InvalidRawImageException ex) {
+                LogIt.log(ex);
+                setException(ex);
+            } catch (NullCommandException ex) {
+                LogIt.log(ex);
+                setException(ex);
             } catch (InvalidFileTypeException ex) {
                 LogIt.log(ex);
+                setException(ex);
             }
-            
-            currentJob.setPrinter(filePrinter);
-            
-            currentJob.prepareJob();
             currentJob = null;
         }
     }
@@ -351,7 +379,15 @@ public class PrintSpooler implements Runnable {
         if(currentJob != null) {
             
             currentJob.setHostOutput(jobHost, jobPort);
-            currentJob.prepareJob();
+            try {
+                currentJob.prepareJob();
+            } catch (InvalidRawImageException ex) {
+                LogIt.log(ex);
+                setException(ex);
+            } catch (NullCommandException ex) {
+                LogIt.log(ex);
+                setException(ex);
+            }
             currentJob = null;
             
         }
@@ -592,5 +628,18 @@ public class PrintSpooler implements Runnable {
     public String getReturnData() {
         return serialPrinter.getReturnData();
     }
+    
+    public void setException(Throwable t) {
+        this.exception = t;
+    }
+    
+    public void clearException() {
+        exception = null;
+    }
+    
+    public Throwable getException() {
+        return exception;
+    }
+    
     
 }

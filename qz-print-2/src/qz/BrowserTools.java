@@ -74,7 +74,6 @@ public class BrowserTools {
                         + "(...)\" instead.");
             }
             else if (function.equals("qzDoneAppending") || 
-                     function.equals("qzDonePrinting") ||
                      function.equals("qzDoneFinding") || 
                      function.equals("qzDoneFindingNetwork")) {
                 LogIt.log(Level.WARNING, "JavaScript function \"" + function + "(...)\" is deprecated and will be removed in future releases.");
@@ -95,7 +94,6 @@ public class BrowserTools {
             // or it's a deprecated javascript function from the qz set
             if (!success && !function.startsWith("jzebra") &&
                 !function.equals("qzDoneAppending") && 
-                !function.equals("qzDonePrinting") &&
                 !function.equals("qzDoneFinding") && 
                 !function.equals("qzDoneFindingNetwork")) {
                 LogIt.log(Level.WARNING, "Tried calling JavaScript function \""

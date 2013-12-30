@@ -48,14 +48,10 @@ public class PrintApplet extends Applet {
     
     private BrowserTools btools;
     private PrintSpooler spooler;
-    private Exception currentException;
     private Charset charset;
-    private PaperFormat paperSize;
     
     @Override
     public void start() {
-        
-        currentException = null;
         
         super.start();
         
@@ -381,7 +377,6 @@ public class PrintApplet extends Applet {
         else {
             LogIt.log("Print Failed");
         }
-        // Deprecated callback. Remove in a future version.
         btools.notifyBrowser("qzDonePrinting");
         return success;
     }
@@ -410,12 +405,12 @@ public class PrintApplet extends Applet {
         return VERSION;
     }
     
-    // TODO: Implement get Exception
-    public Exception getException() {
-        return currentException;
+    public Throwable getException() {
+        return spooler.getException();
     }
+
     public void clearException() {
-        currentException = null;
+        spooler.clearException();
     }
     
     public void setEncoding(String charset) {
@@ -431,7 +426,7 @@ public class PrintApplet extends Applet {
     }
     
     public void setPaperSize(String width, String height) {
-        this.paperSize = PaperFormat.parseSize(width, height);
+        PaperFormat paperSize = PaperFormat.parseSize(width, height);
         spooler.setPaperSize(paperSize);
         LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
                 + paperSize.getUnitDescription() + "x"
@@ -439,7 +434,7 @@ public class PrintApplet extends Applet {
     }
 
     public void setPaperSize(float width, float height) {
-        this.paperSize = new PaperFormat(width, height);
+        PaperFormat paperSize = new PaperFormat(width, height);
         spooler.setPaperSize(paperSize);
         LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
                 + paperSize.getUnitDescription() + "x"
@@ -447,7 +442,7 @@ public class PrintApplet extends Applet {
     }
 
     public void setPaperSize(float width, float height, String units) {
-        this.paperSize = PaperFormat.parseSize("" + width, "" + height, units);
+        PaperFormat paperSize = PaperFormat.parseSize("" + width, "" + height, units);
         spooler.setPaperSize(paperSize);
         LogIt.log(Level.INFO, "Set paper size to " + paperSize.getWidth()
                 + paperSize.getUnitDescription() + "x"
