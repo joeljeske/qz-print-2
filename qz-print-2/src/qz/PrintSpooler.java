@@ -641,7 +641,7 @@ public class PrintSpooler implements Runnable {
     public String getReturnData() {
         return serialPrinter.getReturnData();
     }
-    
+
     public void setException(Throwable t) {
         this.exception = t;
     }
