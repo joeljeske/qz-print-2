@@ -640,8 +640,8 @@ function listNetworkInfo() {
 *    qz.setAutoSize(true);
 *    qz.appendImage($("canvas")[0].toDataURL('image/png'));
 ***************************************************************************/ 
-function printHTML5Page() {
-	$("#content").html2canvas({ 
+function printHTML5Div() {
+	$("#wrapper").html2canvas({ 
 		canvas: hidden_screenshot,
 		onrendered: function() {
 			if (notReady()) { return; }
@@ -651,7 +651,9 @@ function printHTML5Page() {
 			qz.setAutoSize(true);
 			qz.appendImage($("canvas")[0].toDataURL('image/png'));
 			qz.printPS();
-		}
+		},
+		width: $('#wrapper').width() + 40,
+		height: $('#wrapper').height() + 40
 	});
 }
 
