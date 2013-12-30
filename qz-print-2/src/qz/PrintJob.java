@@ -37,20 +37,12 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
 import javax.print.PrintException;
-import javax.print.SimpleDoc;
 import javax.print.attribute.Attribute;
 import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
 import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSize;
-import javax.print.event.PrintJobEvent;
-import javax.print.event.PrintJobListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import qz.exception.InvalidRawImageException;
@@ -65,10 +57,10 @@ import qz.exception.NullCommandException;
 public class PrintJob extends JLabel implements Runnable, Printable {
     
     private PrintJobState state = PrintJobState.STATE_CREATED;
-    private String title = "Print Job";
-    private ArrayList<PrintJobElement> rawData = new ArrayList<PrintJobElement>();;
+    private final String title = "Print Job";
+    private final ArrayList<PrintJobElement> rawData = new ArrayList<PrintJobElement>();;
     private Boolean running = true;
-    private int updateDelay = 100;
+    private final int updateDelay = 100;
     private Printer printer;
     private PrintJobType type;
     private Graphics graphics;
@@ -276,8 +268,11 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             this.setBorder(null);
 
             String jobDataString = null;
+            
             try {
-                jobDataString = new String(jobData.getByteArray(), charset.name());
+                if(charset != null) {
+                    jobDataString = new String(jobData.getByteArray(), charset.name());
+                }
                 jobDataString += "</html>";
             } catch (UnsupportedEncodingException ex) {
                 LogIt.log(ex);
@@ -286,7 +281,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             this.setText(jobDataString);
             j.add(this);
             j.pack();
-            j.setExtendedState(j.ICONIFIED);
+            j.setExtendedState(JFrame.ICONIFIED);
             j.setVisible(true);
 
             // Elimate any margins

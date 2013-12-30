@@ -21,7 +21,6 @@
  */
 package qz;
 
-import java.awt.print.PrinterException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -50,9 +49,9 @@ public class RawPrinter implements Printer {
     private String name;
     private PrintService ps;
     private boolean isFinished;
-    private DocFlavor docFlavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;;
+    private final DocFlavor docFlavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;;
     private DocAttributeSet docAttr;
-    private PrintRequestAttributeSet reqAttr = new HashPrintRequestAttributeSet();
+    private final PrintRequestAttributeSet reqAttr = new HashPrintRequestAttributeSet();
     private String jobTitle;
     
     public String getName() {

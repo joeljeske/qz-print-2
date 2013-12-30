@@ -27,13 +27,10 @@ package qz;
 import java.applet.Applet;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.logging.Level;
 import qz.json.JSONArray;
-import qz.reflection.ReflectException;
 
 /**
  * The PrintApplet is the main component of the Applet

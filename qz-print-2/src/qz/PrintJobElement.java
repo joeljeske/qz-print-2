@@ -30,7 +30,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
-import static java.awt.print.Printable.NO_SUCH_PAGE;
 import static java.awt.print.Printable.PAGE_EXISTS;
 import java.awt.print.PrinterException;
 import java.io.ByteArrayInputStream;
@@ -40,8 +39,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMException;
@@ -62,7 +59,7 @@ public class PrintJobElement {
     public PrintJob pj;
     
     private ByteArrayBuilder data;
-    private Charset charset;
+    private final Charset charset;
     private int imageX = 0;
     private int imageY = 0;
     private int dotDensity = 32;

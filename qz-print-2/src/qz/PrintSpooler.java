@@ -33,7 +33,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
@@ -62,7 +61,7 @@ public class PrintSpooler implements Runnable {
     public Thread currentJobThread;
     
     private JSONArray queueInfo;
-    private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
+    private final ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
     private Printer currentPrinter;
     private String lastPrinterName;
@@ -140,8 +139,6 @@ public class PrintSpooler implements Runnable {
                                     job.print();
                                 }
                                 break;
-                            default:
-                                break;
                         };
                         
                         HashMap<String, String> jobInfo = new HashMap<String, String>();
@@ -198,6 +195,11 @@ public class PrintSpooler implements Runnable {
     }
     /**
      * Creates an image PrintJobElement and adds it to the current print job
+     * @param imagePath
+     * @param charset
+     * @param lang
+     * @param imageX
+     * @param imageY
      */
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
         if(currentJob == null) {
@@ -233,7 +235,7 @@ public class PrintSpooler implements Runnable {
 
     public void appendFile(ByteArrayBuilder url, Charset charset) {
         
-        if(endOfDocument != "") {
+        if(!"".equals(endOfDocument)) {
             
             String[] fileData = getFileData(url, charset).split(endOfDocument);
             String[] consolidatedData;
@@ -431,7 +433,7 @@ public class PrintSpooler implements Runnable {
         for (PrintService ps : psList) {
             PrintServiceAttributeSet psa = ps.getAttributes();
             
-            if(printerListString != "") {
+            if(!"".equals(printerListString)) {
                 printerListString += ",";
             }
             String printerName = psa.get(PrinterName.class).toString();

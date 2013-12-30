@@ -21,7 +21,6 @@
  */
 package qz;
 
-import java.awt.print.PrinterException;
 import javax.print.PrintException;
 import javax.print.PrintService;
 

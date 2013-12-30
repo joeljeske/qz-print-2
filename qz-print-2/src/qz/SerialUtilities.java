@@ -56,6 +56,7 @@ public class SerialUtilities {
      * @param portName
      * @return
      * @throws IOException 
+     * @throws qz.exception.SerialException 
      */
     public static int[] getWindowsAttributes(String portName) throws IOException, SerialException {
         String[] command = { "cmd.exe", "/c", winCmd.replace("?", portName)};

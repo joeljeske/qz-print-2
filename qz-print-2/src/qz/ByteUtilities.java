@@ -92,7 +92,7 @@ public class ByteUtilities {
      * Returns an array of positions. TODO: Make this natively Iterable.
      *
      * @param array
-     * @param target
+     * @param sublist
      * @return
      */
     public static int[] indicesOfSublist(byte[] array, byte[] sublist) {
@@ -223,7 +223,7 @@ public class ByteUtilities {
         if (o instanceof byte[]) {
             return ((byte[]) o).length < 1;
         } else if (o instanceof String) {
-            return ((String) o) == null || ((String) o).equals("");
+            return ((String) o).equals("");
         } else {
             LogIt.log(Level.WARNING, "Uchecked blank comparison.");
             return o == null;

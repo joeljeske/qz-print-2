@@ -21,18 +21,11 @@
  */
 package qz;
 
-import java.awt.print.PrinterException;
-import java.util.Locale;
 import javax.print.DocFlavor;
-import javax.print.DocPrintJob;
 import javax.print.PrintException;
 import javax.print.PrintService;
-import javax.print.SimpleDoc;
 import javax.print.attribute.DocAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.JobName;
-import javax.print.event.PrintJobEvent;
-import javax.print.event.PrintJobListener;
 
 /**
  *

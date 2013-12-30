@@ -25,7 +25,6 @@ import java.applet.Applet;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.print.PrintException;
 import javax.print.PrintService;
 import jssc.SerialPort;
@@ -67,9 +66,9 @@ public class SerialPrinter implements Printer {
     private String serialPorts;
     private String[] portArray;
     private String portName;
-    private Applet applet;
-    private BrowserTools btools;
-    private boolean ready;
+    private final Applet applet;
+    private final BrowserTools btools;
+    private final boolean ready;
 
     public SerialPrinter(Applet applet) {
         //port = new SerialPort(portName);
@@ -257,7 +256,7 @@ public class SerialPrinter implements Printer {
      * Default is 1200 (1.2 seconds)
      * @param timeout 
      */
-    public void setTimeout(int timeout) {
+    private void setTimeout(int timeout) {
         this.timeout = timeout;
     }
     
