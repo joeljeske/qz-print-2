@@ -33,7 +33,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
-import java.util.logging.Logger;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -106,23 +105,14 @@ public class PrintSpooler implements Runnable {
         openJobs = 0;
         alternatePrint = false;
         exception = null;
-        
-        // Configurable variables
-        loopDelay = 1000;
-    
-        // TODO: Get Default Printer
         currentPrinter = null;
         
-        // Main loop - run every loopDelay milliseconds
+        // Main loop
         while(running) {
-            try {
-                
-                queueInfo = new JSONArray();
-                
-                spoolIterator = spool.listIterator();
-                
+            synchronized(spool) {
                 if(spool.size() > 0) {
-                    
+                    spoolIterator = spool.listIterator();
+                    JSONArray currentQueueInfo = new JSONArray();
                     while(spoolIterator.hasNext()) {
 
                         int jobIndex = spoolIterator.nextIndex();
@@ -140,22 +130,15 @@ public class PrintSpooler implements Runnable {
                                 }
                                 break;
                         };
-                        
+
                         HashMap<String, String> jobInfo = new HashMap<String, String>();
                         jobInfo.put("id", String.valueOf(jobIndex));
                         jobInfo.put("title", job.getTitle());
                         jobInfo.put("state", jobState.name());
-                        queueInfo.put(jobInfo);
-                        
+                        currentQueueInfo.put(jobInfo);
                     }
-                    
+                    queueInfo = currentQueueInfo;
                 }
-                
-                Thread.sleep(loopDelay);
-                
-            } catch (InterruptedException ex) {
-                LogIt.log(ex);
-                running = false;
             }
         }
     }
@@ -183,7 +166,9 @@ public class PrintSpooler implements Runnable {
         currentJob.setLogPostScriptFeatures(logPSFeatures);
         currentJob.setAlternatePrinting(alternatePrint);
         
-        spool.add(currentJob);
+        synchronized(spool) {
+            spool.add(currentJob);
+        }
     }
     
     public void append(ByteArrayBuilder data, Charset charset) {
@@ -341,21 +326,23 @@ public class PrintSpooler implements Runnable {
             return true;
         }
         else {
-            while(openJobs > 0) {
-                PrintJob job = spool.get(spool.size() - openJobs);
-                job.setPrinter(currentPrinter);
-                try {
-                    job.prepareJob();
+            synchronized(spool) {
+                while(openJobs > 0) {
+                    PrintJob job = spool.get(spool.size() - openJobs);
+                    job.setPrinter(currentPrinter);
+                    try {
+                        job.prepareJob();
+                    }
+                    catch (InvalidRawImageException ex) {
+                        LogIt.log(ex);
+                        setException(ex);
+                    }
+                    catch (NullCommandException ex) {
+                        LogIt.log(ex);
+                        setException(ex);
+                    }
+                    openJobs -= 1;
                 }
-                catch (InvalidRawImageException ex) {
-                    LogIt.log(ex);
-                    setException(ex);
-                }
-                catch (NullCommandException ex) {
-                    LogIt.log(ex);
-                    setException(ex);
-                }
-                openJobs -= 1;
             }
             currentJob = null;
             return true;
@@ -409,9 +396,11 @@ public class PrintSpooler implements Runnable {
     }
     
     public void cancelJob(int jobIndex) {
-        PrintJob job = spool.get(jobIndex);
-        job.cancel();
-        spool.set(jobIndex, job);
+        synchronized(spool) {
+            PrintJob job = spool.get(jobIndex);
+            job.cancel();
+            spool.set(jobIndex, job);
+        }
     }
     
     public JSONArray getQueueInfo() {

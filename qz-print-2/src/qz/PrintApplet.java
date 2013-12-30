@@ -75,13 +75,12 @@ public class PrintApplet extends Applet {
     }
     
     public String getQueueInfo() {
-        try {
-            JSONArray queueInfo = spooler.getQueueInfo();
+        JSONArray queueInfo = spooler.getQueueInfo();
+        if(queueInfo != null) {
             return queueInfo.toString();
         }
-        catch (NullPointerException ex) {
-            LogIt.log(ex);
-            return "";
+        else {
+            return new JSONArray().toString();
         }
     }
     
