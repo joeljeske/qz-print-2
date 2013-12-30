@@ -66,6 +66,12 @@ public class PrintApplet extends Applet {
         
     }
     
+    @Override
+    public void stop() {
+        spooler.closePort("");
+        super.stop();
+    }
+    
     /* Javascript methods that the browser can call */
     
     /* Testing Functions */
