@@ -107,7 +107,7 @@ function qzDonePrinting() {
 	}
 	
 	// Alert success message
-	alert('Successfully sent print data to "' + qz.getPrinter() + '" queue.');
+	alert('Successfully sent print data to "' + qz.getLastPrinter() + '" queue.');
 }
 
 /***************************************************************************

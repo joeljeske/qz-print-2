@@ -43,6 +43,7 @@ import javax.print.attribute.standard.PrinterName;
 import qz.exception.InvalidFileTypeException;
 import qz.exception.InvalidRawImageException;
 import qz.exception.NullCommandException;
+import qz.exception.NullPrintServiceException;
 import qz.json.JSONArray;
 import qz.reflection.ReflectException;
 
@@ -64,6 +65,7 @@ public class PrintSpooler implements Runnable {
     private ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
     private Printer currentPrinter;
+    private String lastPrinterName;
     private ArrayList<Printer> printerList;
     private String printerListString;
     private FilePrinter filePrinter;
@@ -308,12 +310,15 @@ public class PrintSpooler implements Runnable {
     
     public boolean print() {
         if(currentPrinter == null) {
-            LogIt.log("No printer specified.");
+            LogIt.log("A printer has not been selected.");
+            setException(new NullPrintServiceException("A printer has not been selected."));
             return false;
         }
+        lastPrinterName = currentPrinter.getName();
         
         if(openJobs == 0) {
             LogIt.log("No data has been provided.");
+            setException(new NullCommandException("No data has been provided."));
             return false;
         }
         else if(openJobs == 1) {
@@ -357,6 +362,7 @@ public class PrintSpooler implements Runnable {
     
     public void printToFile(String filePath) {
         if(currentJob != null) {
+            lastPrinterName = "File";
             try {
                 filePrinter.setOutputPath(filePath);
                 currentJob.setPrinter(filePrinter);
@@ -373,11 +379,15 @@ public class PrintSpooler implements Runnable {
             }
             currentJob = null;
         }
+        else {
+            LogIt.log("No data has been provided.");
+            setException(new NullCommandException("No data has been provided."));
+        }
     }
     
     public void printToHost(String jobHost, int jobPort) {
         if(currentJob != null) {
-            
+            lastPrinterName = "Remote Host";
             currentJob.setHostOutput(jobHost, jobPort);
             try {
                 currentJob.prepareJob();
@@ -389,7 +399,10 @@ public class PrintSpooler implements Runnable {
                 setException(ex);
             }
             currentJob = null;
-            
+        }
+        else {
+            LogIt.log("No data has been provided.");
+            setException(new NullCommandException("No data has been provided."));
         }
     }
     
@@ -477,11 +490,11 @@ public class PrintSpooler implements Runnable {
         
     }
 
-    void setPrinter(int printerIndex) {
+    public void setPrinter(int printerIndex) {
         currentPrinter = printerList.get(printerIndex);
     }
 
-    String getPrinter() {
+    public String getPrinter() {
         if(currentPrinter != null) {
             return currentPrinter.getName();
         }
@@ -489,21 +502,30 @@ public class PrintSpooler implements Runnable {
             return null;
         }
     }
+    
+    public String getLastPrinter() {
+        if(lastPrinterName != null) {
+            return lastPrinterName;
+        }
+        else {
+            return null;
+        }
+    }
 
-    void setPaperSize(PaperFormat paperSize) {
+    public void setPaperSize(PaperFormat paperSize) {
         this.paperSize = paperSize;
         
     }
 
-    void setAutoSize(boolean autoSize) {
+    public void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
     }
     
-    boolean getLogPostScriptFeatures() {
+    public boolean getLogPostScriptFeatures() {
         return logPSFeatures;
     }
 
-    void setLogPostScriptFeatures(boolean logPSFeatures) {
+    public void setLogPostScriptFeatures(boolean logPSFeatures) {
         this.logPSFeatures = logPSFeatures;
         if(currentJob != null) {
             currentJob.setLogPostScriptFeatures(logPSFeatures);
@@ -511,17 +533,17 @@ public class PrintSpooler implements Runnable {
         LogIt.log("Console logging of PostScript printing features set to \"" + logPSFeatures + "\"");
     }
 
-    void setEndOfDocument(String endOfDocument) {
+    public void setEndOfDocument(String endOfDocument) {
         this.endOfDocument = endOfDocument;
         LogIt.log("End of Document set to " + this.endOfDocument);
     }
 
-    void setDocumentsPerSpool(int docsPerSpool) {
+    public void setDocumentsPerSpool(int docsPerSpool) {
         this.docsPerSpool = docsPerSpool;
         LogIt.log("Documents per Spool set to " + this.docsPerSpool);
     }
 
-    private String getFileData(ByteArrayBuilder url, Charset charset) {
+    public String getFileData(ByteArrayBuilder url, Charset charset) {
         
         String file;
         String data = null;
@@ -640,6 +662,5 @@ public class PrintSpooler implements Runnable {
     public Throwable getException() {
         return exception;
     }
-    
     
 }

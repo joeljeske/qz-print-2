@@ -155,6 +155,10 @@ public class PrintApplet extends Applet {
         return spooler.getPrinter();
     }
     
+    public String getLastPrinter() {
+        return spooler.getLastPrinter();
+    }
+    
     public String getPrinters() {
         
         try {
@@ -395,10 +399,12 @@ public class PrintApplet extends Applet {
     
     public void printToFile(String filePath) {
         spooler.printToFile(filePath);
+        btools.notifyBrowser("qzDonePrinting");
     }
     
     public void printToHost(String jobHost, int jobPort) {
         spooler.printToHost(jobHost, jobPort);
+        btools.notifyBrowser("qzDonePrinting");
     }
     
     public String getVersion() {
