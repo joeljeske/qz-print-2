@@ -151,6 +151,7 @@ public class PrintApplet extends Applet {
     
     public void findPrinter(String printerName) {
         spooler.findPrinter(printerName);
+        // Deprecated callback. Remove in a future version.
         btools.notifyBrowser("qzDoneFinding");
     }
     
@@ -193,6 +194,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.append(bytes, charset);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     /**
@@ -211,6 +214,8 @@ public class PrintApplet extends Applet {
         
         ByteArrayBuilder data = new ByteArrayBuilder(base64Array);
         spooler.append(data, charset);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     /**
@@ -226,7 +231,8 @@ public class PrintApplet extends Applet {
         byte[] bytes = ByteUtilities.hexStringToByteArray(hexString);
         ByteArrayBuilder data = new ByteArrayBuilder(bytes);
         spooler.append(data, charset);
-        
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     //Stub appendImage function
@@ -240,6 +246,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendImage(bytes, charset, lang, 0, 0);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendImage(String imagePath, String lang, int imageX, int imageY) {
@@ -251,6 +259,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendImage(bytes, charset, lang, imageX, imageY);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendImage(String imagePath, String lang, String dotDensityString) {
@@ -269,6 +279,8 @@ public class PrintApplet extends Applet {
         }
         
         appendImage(imagePath, lang, dotDensity);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendImage(String imagePath, String lang, int dotDensity) {
@@ -279,6 +291,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendImage(bytes, charset, lang, dotDensity);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendImage(String url) {
@@ -290,6 +304,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendPSImage(bytes, charset);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     /**
@@ -308,6 +324,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendXML(bytes, charset, xmlTag);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     /**
@@ -325,6 +343,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendFile(bytes, charset);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendHTML(String html) {
@@ -336,7 +356,8 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendHTML(bytes, charset);
-        
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public void appendPDF(String url) {
@@ -348,17 +369,21 @@ public class PrintApplet extends Applet {
             LogIt.log(ex);
         }
         spooler.appendPDF(bytes, charset);
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneAppending");
     }
     
     public boolean print() {
-        if(spooler.print()) {
+        Boolean success = spooler.print();
+        if(success) {
             LogIt.log("Print Successful");
-            return true;
         }
         else {
             LogIt.log("Print Failed");
-            return false;
         }
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDonePrinting");
+        return success;
     }
     
     // Stub function for backwards compatability
@@ -451,6 +476,8 @@ public class PrintApplet extends Applet {
     
     public void findNetworkInfo() {
         spooler.findNetworkInfo();
+        // Deprecated callback. Remove in a future version.
+        btools.notifyBrowser("qzDoneFindingNetwork");
     }
     
     public String getMac() {

@@ -65,12 +65,21 @@ public class BrowserTools {
             
             LogIt.log(Level.INFO, "Succesfully called JavaScript function \""
                     + function + "(...)\"...");
+            
+            // Check for deprecated function use and log an appropriate warning
             if (function.startsWith("jzebra")) {
                 LogIt.log(Level.WARNING, "JavaScript function \"" + function
                         + "(...)\" is deprecated and will be removed in future releases. "
                         + "Please use \"" + function.replaceFirst("jzebra", "qz")
                         + "(...)\" instead.");
             }
+            else if (function.equals("qzDoneAppending") || 
+                     function.equals("qzDonePrinting") ||
+                     function.equals("qzDoneFinding") || 
+                     function.equals("qzDoneFindingNetwork")) {
+                LogIt.log(Level.WARNING, "JavaScript function \"" + function + "(...)\" is deprecated and will be removed in future releases.");
+            }
+            
             return true;
         } catch (JSException e) {
             boolean success = false;
@@ -83,7 +92,12 @@ public class BrowserTools {
                 success = notifyBrowser("jzebraDoneFindingPrinters", o);
             }
             // Warn about the function missing only if it wasn't recovered using the old jzebra name
-            if (!success && !function.startsWith("jzebra")) {
+            // or it's a deprecated javascript function from the qz set
+            if (!success && !function.startsWith("jzebra") &&
+                !function.equals("qzDoneAppending") && 
+                !function.equals("qzDonePrinting") &&
+                !function.equals("qzDoneFinding") && 
+                !function.equals("qzDoneFindingNetwork")) {
                 LogIt.log(Level.WARNING, "Tried calling JavaScript function \""
                         + function + "(...)\" through web browser but it has not "
                         + "been implemented (" + e.getLocalizedMessage() + ")");
