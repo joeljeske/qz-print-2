@@ -473,7 +473,6 @@ function printPages() {
 	
 	// Tell the applet to print.
 	qz.print();
-
 }
 
 /***************************************************************************
@@ -481,7 +480,7 @@ function printPages() {
 * encoded data.
 * Usage:
 *    qz.appendXML('/path/to/file.xml');
-*    window['qzDoneAppending'] = function() { qz.print(); };
+*    qz.print();
 ***************************************************************************/  
 function printXML() {
 	if (notReady()) { return; }
@@ -496,9 +495,6 @@ function printXML() {
 
 	// Tell the applet to print.
 	qz.print();
-	
-	// Remove reference to this function
-	window['qzDoneAppending'] = null;
 }
 
 /***************************************************************************
@@ -535,7 +531,7 @@ function printHex() {
 * print commands.
 * Usage:
 *    qz.appendFile('/path/to/file.txt');
-*    window['qzDoneAppending'] = function() { qz.print(); };
+*    qz.print();
 ***************************************************************************/ 
 function printFile(file) {
 	if (notReady()) { return; }
@@ -545,7 +541,6 @@ function printFile(file) {
 	
 	// Tell the applet to print.
 	qz.print();
-
 }
 
 /***************************************************************************
@@ -553,7 +548,7 @@ function printFile(file) {
 * Not to be used in combination with raw printers.
 * Usage:
 *    qz.appendImage('/path/to/image.png');
-*    window['qzDoneAppending'] = function() { qz.printPS(); };
+*    qz.printPS();
 ***************************************************************************/ 
 function printImage(scaleImage) {
 	if (notReady()) { return; }
@@ -574,7 +569,6 @@ function printImage(scaleImage) {
 	
 	// Tell the applet to print PostScript.
 	qz.printPS();
-		
 }
 
 /***************************************************************************
@@ -582,7 +576,7 @@ function printImage(scaleImage) {
 * Not to be used in combination with raw printers.
 * Usage:
 *    qz.appendPDF('/path/to/sample.pdf');
-*    window['qzDoneAppending'] = function() { qz.printPS(); };
+*    qz.printPS();
 ***************************************************************************/ 
 function printPDF() {
 	if (notReady()) { return; }
@@ -656,14 +650,7 @@ function printHTML5Page() {
 			qz.setPaperSize("8.5in", "11.0in");  // US Letter
 			qz.setAutoSize(true);
 			qz.appendImage($("canvas")[0].toDataURL('image/png'));
-			// Automatically gets called when "qz.appendFile()" is finished.
-			window['qzDoneAppending'] = function() {
-				// Tell the applet to print.
-				qz.printPS();
-				
-				// Remove reference to this function
-				window['qzDoneAppending'] = null;
-			};
+			qz.printPS();
 		}
 	});
 }
@@ -709,8 +696,8 @@ function useAlternatePrinting() {
 * Prototype function to list all available com ports availabe to this PC
 * used for RS232 communication.  Relies on jssc_qz.jar signed and in the 
 * /dist/ folder.
-*    qz.findPorts();
 *    window['qzDoneFindingPorts'] = function() { alert(qz.getPorts()); };
+*    qz.findPorts();
 ***************************************************************************/ 
 function listSerialPorts() {
 	if (isLoaded()) {
@@ -738,9 +725,9 @@ function listSerialPorts() {
 /***************************************************************************
 * Prototype function to open the specified communication port for 2-way 
 * communication.
+*    window['qzDoneOpeningPort'] = function(port) { alert(port); };
 *    qz.openPort('COM1');
 *    qz.openPort('/dev/ttyUSB0');
-*    window['qzDoneOpeningPort'] = function(port) { alert(port); };
 ***************************************************************************/ 
 function openSerialPort() {
 	if (isLoaded()) {
@@ -761,9 +748,9 @@ function openSerialPort() {
 
 /***************************************************************************
 * Prototype function to close the specified communication port.
+*    window['qzDoneClosingPort'] = function(port) { alert(port); };
 *    qz.closePort('COM1');
 *    qz.closePort('/dev/ttyUSB0');
-*    window['qzDoneClosingPort'] = function(port) { alert(port); };
 ***************************************************************************/ 
 function closeSerialPort() {
 	if (isLoaded()) {
