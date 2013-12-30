@@ -521,13 +521,52 @@ public class PrintApplet extends Applet {
     // Deprecated functions
     // TODO: Properly address deprecating these functions
     
-    // isDone functions no longer apply to a spool based system
-    // Legacy javascript may rely on these. For now just return true;
+    /**
+     * Check if the appending operation is complete.
+     * 
+     * @return Whether the element is done appending
+     * @deprecated This function is no longer needed as appending is instant.
+     */
+    @Deprecated
     public boolean isDoneAppending() {
+        LogIt.log(Level.WARNING, "isDoneAppending() has been deprecated and will be removed in a future version.");
         return true;
     }
+    
+    /**
+     * Check if the printing operation is complete.
+     * 
+     * @return Whether the job is done printing
+     * @deprecated This function is no longer useful in a spooling context.
+     * Use {@link getQueueInfo()} to get information about existing jobs.
+     */
+    @Deprecated
     public boolean isDonePrinting() {
+        LogIt.log(Level.WARNING, "isDonePrinting() has been deprecated and will be removed in a future version. Try using getQueueInfo().");
         return true;
+    }
+    
+    /**
+     * Check whether multiple instances are currently allowed.
+     * 
+     * @return The current value of allowMultipleInstances
+     * @deprecated This functionality is no longer supported.
+     */
+    @Deprecated
+    public boolean getAllowMultipleInstances() {
+        LogIt.log(Level.WARNING, "getAllowMultipleInstances() has been deprecated and will be removed in a future version. This functionality is no longer supported.");
+        return false;
+    }
+    
+    /**
+     * Set whether multiple instances are currently allowed.
+     * 
+     * @param newValue The value to be set
+     * @deprecated This functionality is no longer supported.
+     */
+    @Deprecated
+    public void allowMultipleInstances(Boolean newValue) {
+        LogIt.log(Level.WARNING, "allowMultipleInstances() has been deprecated and will be removed in a future version. This functionality is no longer supported.");
     }
     
 }
