@@ -355,7 +355,6 @@ public class SerialPrinter implements Printer {
                 if (beginPos.length > 0 && endPos.length > 0) {
                     int _begin = beginPos[beginPos.length -1];
                     int _end  = endPos[endPos.length -1];
-                    // TODO:  Use specified charset in PrintApplet.
                     LogIt.log(new String(getOutputBuffer().getByteArray(), _begin, _end - _begin));
                     output = new byte[_end - _begin];
                     System.arraycopy(getOutputBuffer().getByteArray(), _begin, output, 0, _end - _begin);
