@@ -28,7 +28,8 @@ import javax.print.attribute.DocAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
 /**
- *
+ * A PostScript printer. This class implements the Printer class.
+ * 
  * @author Thomas Hart II
  */
 public class PSPrinter implements Printer {

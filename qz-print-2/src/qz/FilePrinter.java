@@ -43,6 +43,12 @@ public class FilePrinter implements Printer {
         
     }
 
+    /**
+     * Set the target file for output.
+     * 
+     * @param outputPath The file name
+     * @throws InvalidFileTypeException 
+     */
     public void setOutputPath(String outputPath) throws InvalidFileTypeException {
         // Check for vulnerable file extensions, such as "exe" or "bat", etc.
         if (FileUtilities.isBadExtension(outputPath)) {

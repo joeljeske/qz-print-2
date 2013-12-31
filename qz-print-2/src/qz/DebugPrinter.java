@@ -25,8 +25,9 @@ import javax.print.PrintException;
 import javax.print.PrintService;
 
 /**
- *
- * @author Owner
+ * Debug Printer is a log output only printer that can be used in development
+ * 
+ * @author Thomas Hart II
  */
 public class DebugPrinter implements Printer {
 

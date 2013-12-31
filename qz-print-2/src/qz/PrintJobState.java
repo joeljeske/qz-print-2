@@ -23,6 +23,7 @@ package qz;
 
 /**
  * An enum to hold possible states of PrintJobs
+ * 
  * @author Thomas Hart
  */
 public enum PrintJobState {

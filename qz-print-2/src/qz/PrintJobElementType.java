@@ -23,6 +23,7 @@ package qz;
 
 /**
  * An enum to hold possible types of PrintJobElements
+ * 
  * @author Thomas Hart
  */
 public enum PrintJobElementType {

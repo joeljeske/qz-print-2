@@ -41,7 +41,9 @@ import javax.print.event.PrintJobEvent;
 import javax.print.event.PrintJobListener;
 
 /**
- *
+ * RawPrinter represents a printer that can accept raw data such as a receipt
+ * printer.
+ * 
  * @author Thomas Hart II
  */
 public class RawPrinter implements Printer {
@@ -141,6 +143,13 @@ public class RawPrinter implements Printer {
         }
     }
     
+    /**
+     * printToHost sends the raw data to a remote host.
+     * 
+     * @param data The data to send
+     * @param jobHost The target host
+     * @param jobPort The port on the target machine
+     */
     public void printToHost(ByteArrayBuilder data, String jobHost, int jobPort) {
         LogIt.log("Printing to host " + jobHost + ":" + jobPort);
         
@@ -180,7 +189,13 @@ public class RawPrinter implements Printer {
         this.jobTitle = jobTitle;
     }
     
-    private void processStream(Process pr) throws Throwable {
+    /**
+     * processStream provides a BufferedReader for alternate printing
+     * 
+     * @param pr The spawned process provided by the alternate printing routine
+     * @throws Throwable 
+     */
+    public void processStream(Process pr) throws Throwable {
         BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         String tmp;
         String output = "";

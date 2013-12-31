@@ -32,14 +32,28 @@ import javax.print.PrintService;
  */
 public interface Printer {
 
-    // getName should return a String representation of the Printer's name
+    /**
+     * getName returns a String representation of the printer's name
+     * 
+     * @return The printer's name
+     */
     public abstract String getName();
     
-    // This function sends raw data to a Raw type printer
+    /**
+     * This function sends raw data to a Raw type printer
+     * 
+     * @param data The raw data to send
+     * @throws javax.print.PrintException
+     */ 
     public abstract void printRaw(ByteArrayBuilder data) throws PrintException;
 
-    // This function sends raw data to a Raw type printer using an alternate
-    // approach designed to work with *nix style printing (CUPS)
+    /**
+     * This function sends raw data to a Raw type printer using an alternate 
+     * approach designed to work with *nix style printing (CUPS)
+     * 
+     * @param data The raw data to send
+     * @throws javax.print.PrintException
+     */
     public void printAlternate(ByteArrayBuilder data) throws PrintException;
     
     /**
@@ -52,6 +66,8 @@ public interface Printer {
     
     /**
      * Sets the PrintService associated with this Printer
+     * 
+     * @param ps
      */
     public abstract void setPrintService(PrintService ps);
     
@@ -72,11 +88,16 @@ public interface Printer {
     
     /**
      * Sets the name variable of the printer
-     * 
-     * @param name 
+     *
+     * @param name The printer's name
      */
     public abstract void setName(String name);
     
+    /**
+     * Sets the title of the job.
+     * 
+     * @param jobTitle The new title
+     */
     public abstract void setJobTitle(String jobTitle);
 
     

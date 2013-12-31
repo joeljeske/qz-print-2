@@ -35,7 +35,9 @@ import jssc.SerialPortList;
 import jssc.SerialPortTimeoutException;
 
 /**
- *
+ * SerialPrinter implements the Printer class and provides functions for sending
+ * and processing received serial data.
+ * 
  * @author Thomas Hart II
  */
 public class SerialPrinter implements Printer {
@@ -70,6 +72,12 @@ public class SerialPrinter implements Printer {
     private final BrowserTools btools;
     private final boolean ready;
 
+    /**
+     * Initialize the SerialPrinter variables and grab a reference to the applet
+     * so that javascript callback functions can be called.
+     * 
+     * @param applet 
+     */
     public SerialPrinter(Applet applet) {
         //port = new SerialPort(portName);
         this.baudRate = SerialPort.BAUDRATE_9600;
@@ -120,6 +128,9 @@ public class SerialPrinter implements Printer {
         
     }
     
+    /**
+     * findPorts starts the process of finding the list of serial ports.
+     */
     public void findPorts() {
         
         LogIt.log("Serial Printer now finding ports.");
@@ -133,10 +144,20 @@ public class SerialPrinter implements Printer {
  
     }
 
+    /**
+     * Return a comma delimited String of all available serial ports
+     * 
+     * @return The list of ports
+     */
     public String getPorts() {
         return serialPorts;
     }
 
+    /**
+     * openPort creates a port reference and opens it.
+     * @param portName The name of the port to open
+     * @return A boolean representing whether or not opening the port succeeded.
+     */
     public boolean openPort(String portName) {
         if (port == null) {
             port = new SerialPort(this.portName = portName);
@@ -174,6 +195,14 @@ public class SerialPrinter implements Printer {
         return port.isOpened();
     }
 
+    /**
+     * closePort closes the currently open port. A port name is provided but is
+     * only used in the log. Since only one port can be open at a time, 
+     * closePort does not require you to specify the correct port.
+     * 
+     * @param portName The name of the port to close. Only used in log.
+     * @return A boolean representing whether the close routine was successful.
+     */
     public boolean closePort(String portName) {
         if (port == null || !port.isOpened()) {
             LogIt.log(Level.WARNING, "Serial Port [" + portName + "] does not appear to be open.");
@@ -198,14 +227,33 @@ public class SerialPrinter implements Printer {
         return closed;
     }
 
+    /**
+     * Set the character to mark the beginning of returned serial data.
+     * 
+     * @param serialBegin The beginning character.
+     */
     public void setSerialBegin(ByteArrayBuilder serialBegin) {
         this.begin = serialBegin.getByteArray();
     }
 
+    /**
+     * Set the character to mark the ending of returned serial data.
+     * 
+     * @param serialEnd The ending character.
+     */
     public void setSerialEnd(ByteArrayBuilder serialEnd) {
         this.end = serialEnd.getByteArray();
     }
 
+    /**
+     * Sets the properties for communicating with serial ports.
+     * 
+     * @param baud
+     * @param dataBits
+     * @param stopBits
+     * @param parity
+     * @param flowControl
+     */
     public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
         this.baudRate = SerialUtilities.parseBaudRate(baud);
         this.dataBits = SerialUtilities.parseDataBits(dataBits);
@@ -214,8 +262,11 @@ public class SerialPrinter implements Printer {
         this.flowControl = SerialUtilities.parseFlowControl(flowControl);
     }
 
-    // TODO: Finish this function and figure out how to get serialData set so that
-    // it sends properly.
+    /**
+     * Send serial data to the opened port.
+     * 
+     * @param serialData A string of the data to send.
+     */
     public void send(String serialData) {
         if(port != null) {
             inputBuffer = getInputBuffer();
@@ -240,6 +291,11 @@ public class SerialPrinter implements Printer {
         }
     }
 
+    /**
+     * Get any returned serial data.
+     * 
+     * @return The returned data
+     */
     public String getReturnData() {
         if(output != null) {
             String returnData = new String(output);
@@ -260,6 +316,9 @@ public class SerialPrinter implements Printer {
         this.timeout = timeout;
     }
     
+    /**
+     * Fetch a list of available serial ports and set the serialPorts variable.
+     */
     public void fetchPortList() {
         try {
             StringBuilder sb = new StringBuilder();
@@ -278,6 +337,12 @@ public class SerialPrinter implements Printer {
         }
     }
 
+    /**
+     * A listener that is attached to the serial port when data is sent to
+     * monitor for any returned data.
+     * 
+     * @param event A reference to the serial port returned data event
+     */
     public void serialEventListener(SerialPortEvent event) {
         try {
             // Receive data
@@ -312,6 +377,12 @@ public class SerialPrinter implements Printer {
         
     }
     
+    /**
+     * Grab a reference to or create a ByteArrayBuilder to use as an
+     * input buffer
+     * 
+     * @return The inputBuffer ByteArrayBuilder
+     */
     public ByteArrayBuilder getInputBuffer() {
         if (this.inputBuffer == null) {
             this.inputBuffer = new ByteArrayBuilder();
