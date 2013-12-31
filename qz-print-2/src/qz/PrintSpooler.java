@@ -54,11 +54,9 @@ import qz.reflection.ReflectException;
  */
 public class PrintSpooler implements Runnable {
     
-    public boolean running;
-    public int loopDelay;
-    public PrintJob currentJob;
-    public Thread currentJobThread;
-    
+    private boolean running;
+    private PrintJob currentJob;
+    private Thread currentJobThread;
     private JSONArray queueInfo;
     private final ArrayList<PrintJob> spool = new ArrayList<PrintJob>();
     private ListIterator<PrintJob> spoolIterator;
@@ -81,12 +79,10 @@ public class PrintSpooler implements Runnable {
     private Applet applet;
     private Throwable exception;
     
-    public void PrintSpooler() {
-
-    }
-    
-    // The run loop will consistently check the spool List and call functions
-    // based on the state of each PrintJob
+    /**
+     * The run loop will consistently check the spool List and call functions
+     * based on the state of each PrintJob
+     */
     public void run() {
         
         LogIt.log("PrintSpooler started");
@@ -143,11 +139,19 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * Set the applet reference
+     * 
+     * @param applet
+     */
     public void setApplet(Applet applet) {
         this.applet = applet;
         serialPrinter = new SerialPrinter(applet);
     }
     
+    /**
+     * Create a PrintJob and add it to the spool
+     */
     public void createJob() {
         
         openJobs += 1;
@@ -171,6 +175,12 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * Append raw data to a PrintJob
+     * 
+     * @param data The data to add
+     * @param charset The charset of the data
+     */
     public void append(ByteArrayBuilder data, Charset charset) {
         if(currentJob == null) {
             createJob();
@@ -178,13 +188,15 @@ public class PrintSpooler implements Runnable {
         
         currentJob.append(data, charset);
     }
+    
     /**
      * Creates an image PrintJobElement and adds it to the current print job
-     * @param imagePath
-     * @param charset
-     * @param lang
-     * @param imageX
-     * @param imageY
+     * 
+     * @param imagePath The file path of the image
+     * @param charset The charset of the file path
+     * @param lang The target raw printer language to translate the image to
+     * @param imageX The width of the image
+     * @param imageY The height of the image
      */
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int imageX, int imageY) {
         if(currentJob == null) {
@@ -194,6 +206,14 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, imageX, imageY);
     }
 
+    /**
+     * Creates an image PrintJobElement and adds it to the current print job
+     * 
+     * @param imagePath The file path of the image
+     * @param charset The charset of the file path
+     * @param lang The target raw printer language to translate the image to
+     * @param dotDensity The dot density of the image
+     */
     public void appendImage(ByteArrayBuilder imagePath, Charset charset, String lang, int dotDensity) {
         if(currentJob == null) {
             createJob();
@@ -202,6 +222,12 @@ public class PrintSpooler implements Runnable {
         currentJob.appendImage(imagePath, charset, lang, dotDensity);
     }
     
+    /**
+     * appendPSImage adds an image PrintJobElement to a PostScript job
+     * 
+     * @param url The path of the image
+     * @param charset The charset of the path
+     */
     public void appendPSImage(ByteArrayBuilder url, Charset charset) {
         if(currentJob == null) {
             createJob();
@@ -210,6 +236,14 @@ public class PrintSpooler implements Runnable {
         currentJob.appendPSImage(url, charset);
     }
     
+    /**
+     * appendXML pulls data from an xml file/tag and appends it to a raw print
+     * job
+     * 
+     * @param url The path of the xml file
+     * @param charset The charset of the path
+     * @param xmlTag The XML tag to pull the data from
+     */
     public void appendXML(ByteArrayBuilder url, Charset charset, String xmlTag) {
         if(currentJob == null) {
             createJob();
@@ -218,6 +252,13 @@ public class PrintSpooler implements Runnable {
         currentJob.appendXML(url, charset, xmlTag);
     }
 
+    /**
+     * appendFile reads the contents of a file and adds the data to a raw
+     * print job
+     * 
+     * @param url The path of the file
+     * @param charset The charset of the path
+     */
     public void appendFile(ByteArrayBuilder url, Charset charset) {
         
         if(!"".equals(endOfDocument)) {
@@ -279,6 +320,12 @@ public class PrintSpooler implements Runnable {
         
     }
     
+    /**
+     * appendHTML adds an HTML type PrintJobElement to an HTML PrintJob
+     * 
+     * @param html The HTML to add
+     * @param charset The charset of the HTML
+     */
     public void appendHTML(ByteArrayBuilder html, Charset charset) {
         if(currentJob == null) {
             createJob();
@@ -287,6 +334,12 @@ public class PrintSpooler implements Runnable {
         currentJob.appendHTML(html, charset);
     }
     
+    /**
+     * appendPDF adds a PDF file PrintJobElement to a PostScript PrintJob
+     * 
+     * @param url
+     * @param charset 
+     */
     public void appendPDF(ByteArrayBuilder url, Charset charset) {
         if(currentJob == null) {
             createJob();
@@ -295,6 +348,11 @@ public class PrintSpooler implements Runnable {
         currentJob.appendPDF(url, charset);
     }
     
+    /**
+     * print will prepare the currentJob (or list of open jobs) for printing
+     * 
+     * @return Whether the print routine was successful
+     */
     public boolean print() {
         if(currentPrinter == null) {
             LogIt.log("A printer has not been selected.");
@@ -349,6 +407,11 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * printToFile will set the file output path and prepare the current job
+     * 
+     * @param filePath The output file to write to
+     */
     public void printToFile(String filePath) {
         if(currentJob != null) {
             lastPrinterName = "File";
@@ -374,6 +437,12 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * printToHost will set the remote host and prepare the current job
+     * 
+     * @param jobHost The remote host to send to
+     * @param jobPort The port on the remote host
+     */
     public void printToHost(String jobHost, int jobPort) {
         if(currentJob != null) {
             lastPrinterName = "Remote Host";
@@ -395,6 +464,10 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * Cancel a job
+     * @param jobIndex The index of the job to cancel
+     */
     public void cancelJob(int jobIndex) {
         synchronized(spool) {
             PrintJob job = spool.get(jobIndex);
@@ -403,10 +476,22 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * Get the queue info as a JSONArray
+     * 
+     * @return The queueInfo JSONArray
+     */
     public JSONArray getQueueInfo() {
         return queueInfo;
     }
     
+    /**
+     * Returns a string with the contents of the job data. This is only really
+     * useful for Raw data PrintJobs
+     * 
+     * @param jobIndex The index of the job to get info for
+     * @return A String representation of the job data
+     */
     public String getJobInfo(int jobIndex) {
         PrintJob job = spool.get(jobIndex);
         String jobInfo = job.getInfo();
@@ -414,6 +499,10 @@ public class PrintSpooler implements Runnable {
         return jobInfo;
     }
 
+    /**
+     * Get a list of all printers current installed and update the local
+     * printerList variable
+     */
     public void findAllPrinters() {
         
         PrintService[] psList;
@@ -444,10 +533,21 @@ public class PrintSpooler implements Runnable {
         
     }
     
+    /**
+     * Return the printer list
+     *
+     * @return A comma delimited string of printers
+     */
     public String getPrinters() {
         return printerListString;
     }
 
+    /**
+     * Search for a printer by name. This function uses a set of searches to 
+     * attempt to find the intended printer.
+     * 
+     * @param printerName The name (or partial name) of the printer to find
+     */
     public void findPrinter(String printerName) {
         
         currentPrinter = null;
@@ -481,10 +581,20 @@ public class PrintSpooler implements Runnable {
         
     }
 
+    /**
+     * Set the current printer.
+     * 
+     * @param printerIndex The index of the printer in printerList
+     */
     public void setPrinter(int printerIndex) {
         currentPrinter = printerList.get(printerIndex);
     }
 
+    /**
+     * Get the current printer's name.
+     * 
+     * @return The current printer's name.
+     */
     public String getPrinter() {
         if(currentPrinter != null) {
             return currentPrinter.getName();
@@ -494,6 +604,11 @@ public class PrintSpooler implements Runnable {
         }
     }
     
+    /**
+     * Get the printer name of the printer used in the last printed job
+     * 
+     * @return The last printer's name
+     */
     public String getLastPrinter() {
         if(lastPrinterName != null) {
             return lastPrinterName;
@@ -503,19 +618,39 @@ public class PrintSpooler implements Runnable {
         }
     }
 
+    /**
+     * Set the paper size for new jobs.
+     * 
+     * @param paperSize 
+     */
     public void setPaperSize(PaperFormat paperSize) {
         this.paperSize = paperSize;
         
     }
 
+    /**
+     * Toggle whether PostScript autosizing should be enabled
+     * 
+     * @param autoSize 
+     */
     public void setAutoSize(boolean autoSize) {
         this.autoSize = autoSize;
     }
     
+    /**
+     * Return the logPSFeatures boolean
+     * 
+     * @return logPSFeatures
+     */
     public boolean getLogPostScriptFeatures() {
         return logPSFeatures;
     }
 
+    /**
+     * Set the PostScript feature logging variable
+     * 
+     * @param logPSFeatures The new value
+     */
     public void setLogPostScriptFeatures(boolean logPSFeatures) {
         this.logPSFeatures = logPSFeatures;
         if(currentJob != null) {
@@ -524,16 +659,34 @@ public class PrintSpooler implements Runnable {
         LogIt.log("Console logging of PostScript printing features set to \"" + logPSFeatures + "\"");
     }
 
+    /**
+     * Set the character that marks the end of the document in spooled raw
+     * print jobs
+     * 
+     * @param endOfDocument The end of document character
+     */
     public void setEndOfDocument(String endOfDocument) {
         this.endOfDocument = endOfDocument;
         LogIt.log("End of Document set to " + this.endOfDocument);
     }
 
+    /**
+     * Set the documents to spool together per job in spooled raw print jobs
+     * 
+     * @param docsPerSpool The number of documents per spooled job
+     */
     public void setDocumentsPerSpool(int docsPerSpool) {
         this.docsPerSpool = docsPerSpool;
         LogIt.log("Documents per Spool set to " + this.docsPerSpool);
     }
 
+    /**
+     * getFileData will read a file's data and return it as a String
+     * 
+     * @param url The path of the file.
+     * @param charset The charset of the file
+     * @return A String of the file's data
+     */
     public String getFileData(ByteArrayBuilder url, Charset charset) {
         
         String file;
@@ -551,6 +704,9 @@ public class PrintSpooler implements Runnable {
         return data;
     }
 
+    /**
+     * Find the machine's ip and mac address and set the local variables
+     */
     public void findNetworkInfo() {
         
         if(networkUtilities == null) {
@@ -584,14 +740,29 @@ public class PrintSpooler implements Runnable {
 
     }
 
+    /**
+     * Getter for Mac Address
+     * 
+     * @return The machine's Mac Address
+     */
     public String getMac() {
         return macAddress;
     }
 
+    /**
+     * Getter for IP Address
+     * 
+     * @return The machine's IP Address
+     */
     public String getIP() {
         return ipAddress;
     }
     
+    /**
+     * Turn alternate printing on or off
+     * 
+     * @param alternatePrint The new value of alternatePrint
+     */
     public void useAlternatePrinting(boolean alternatePrint) {
         this.alternatePrint = alternatePrint;
         
@@ -602,54 +773,121 @@ public class PrintSpooler implements Runnable {
         LogIt.log("Alternate printing set to " + alternatePrint);
     }
     
+    /**
+     * Getter for alternate printing setting
+     * @return Alternate printing boolean
+     */
     public boolean isAlternatePrinting() {
         return alternatePrint;
     }
 
+    /**
+     * findPorts starts the process of finding the list of serial ports.
+     */
     public void findPorts() {
         serialPrinter.findPorts();
     }
 
+    /**
+     * Return a comma delimited String of all available serial ports
+     * 
+     * @return The list of ports
+     */
     public String getPorts() {
         return serialPrinter.getPorts();
     }
 
+    /**
+     * openPort creates a port reference and opens it.
+     * 
+     * @param portName The name of the port to open
+     */
     public void openPort(String portName) {
         serialPrinter.openPort(portName);
     }
 
+    /**
+     * closePort closes the currently open port. A port name is provided but is
+     * only used in the log. Since only one port can be open at a time, 
+     * closePort does not require you to specify the correct port.
+     * 
+     * @param portName The name of the port to close. Only used in log.
+     */
     public void closePort(String portName) {
         serialPrinter.closePort(portName);
     }
 
+    /**
+     * Set the character to mark the beginning of returned serial data.
+     * 
+     * @param serialBegin The beginning character.
+     */
     public void setSerialBegin(ByteArrayBuilder serialBegin) {
         serialPrinter.setSerialBegin(serialBegin);
     }
 
+    /**
+     * Set the character to mark the ending of returned serial data.
+     * 
+     * @param serialEnd The ending character.
+     */
     public void setSerialEnd(ByteArrayBuilder serialEnd) {
         serialPrinter.setSerialEnd(serialEnd);
     }
 
+    /**
+     * Sets the properties for communicating with serial ports.
+     * 
+     * @param baud
+     * @param dataBits
+     * @param stopBits
+     * @param parity
+     * @param flowControl
+     */
     public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
         serialPrinter.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
     }
 
+    /**
+     * Send serial data to the opened port.
+     * 
+     * @param serialData A string of the data to send.
+     */
     public void sendSerialData(String serialData) {
         serialPrinter.send(serialData);
     }
 
+    /**
+     * Get any returned serial data.
+     * 
+     * @return The returned data
+     */
     public String getReturnData() {
         return serialPrinter.getReturnData();
     }
 
+    /**
+     * Set the current exception. This set of functions is used to share
+     * exception information with the JavaScript layer
+     * 
+     * @param t The Throwable attached to the Exception
+     */
     public void setException(Throwable t) {
         this.exception = t;
     }
     
+    /**
+     * Clear the current exception.
+     */
     public void clearException() {
         exception = null;
     }
     
+    /**
+     * Get the current exception
+     * 
+     * @return The current exception
+     */
     public Throwable getException() {
         return exception;
     }

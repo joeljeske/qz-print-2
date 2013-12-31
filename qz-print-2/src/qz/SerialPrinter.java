@@ -155,6 +155,7 @@ public class SerialPrinter implements Printer {
 
     /**
      * openPort creates a port reference and opens it.
+     * 
      * @param portName The name of the port to open
      * @return A boolean representing whether or not opening the port succeeded.
      */

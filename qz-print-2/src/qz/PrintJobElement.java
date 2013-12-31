@@ -53,11 +53,10 @@ import qz.exception.NullCommandException;
  */
 public class PrintJobElement {
     
-    public int sequence;
-    public boolean prepared;
-    public PrintJobElementType type;
-    public PrintJob pj;
-    
+    private int sequence;
+    private boolean prepared;
+    private PrintJobElementType type;
+    private PrintJob pj;
     private ByteArrayBuilder data;
     private final Charset charset;
     private int imageX = 0;
@@ -120,17 +119,15 @@ public class PrintJobElement {
         prepared = false;
     }
     
+    /**
+     * Prepare the PrintJobElement
+     * 
+     * @return Boolean representing success
+     * @throws IOException
+     * @throws InvalidRawImageException
+     * @throws NullCommandException 
+     */
     public boolean prepare() throws IOException, InvalidRawImageException, NullCommandException {
-
-        //TODO: Add prepare code for all types
-        /*
-            RAW
-            IMAGE
-            IMAGE_PS
-            XML
-            HTML
-            PDF
-        */
 
         // An image file, pull the file into an ImageWrapper and get the 
         // encoded data
@@ -206,23 +203,58 @@ public class PrintJobElement {
         return true;
     }
     
+    /**
+     * Check if the PrintJobElement has been prepared
+     * 
+     * @return Boolean representing whether the PrintJobElement is prepared
+     */
     public boolean isPrepared() {
         return prepared;
     }
     
+    /**
+     * Get the PrintJobElement's data. In the case of a raw element this is raw 
+     * data, though other element types will use this to hold a url
+     * 
+     * @return The element's data
+     */
     public ByteArrayBuilder getData() {
         return data;
     }
     
+    /**
+     * Getter for the bufferedImage. This is used for PostScript image files
+     * 
+     * @return The buffered image data
+     */
     public BufferedImage getBufferedImage() {
         return bufferedImage;
     }
     
+    /**
+     * Getter for the PrintJobElement's charset
+     * 
+     * @return The element's charset
+     */
     public Charset getCharset() {
         return charset;
     }
     
+    /**
+     * Getter for the PrintJobElement's type
+     * 
+     * @return The element's type
+     */
+    public PrintJobElementType getType() {
+        return type;
+    }
     
+    /**
+     * Getter for the PDFFile object. This object is used for pdf PrintJobElements
+     * 
+     * @return The processed PDFFile
+     * @throws PrinterException
+     */
     public PDFFile getPDFFile() throws PrinterException {
         
         if (pdfFile == null && bufferedPDF != null) {
@@ -236,6 +268,16 @@ public class PrintJobElement {
         return pdfFile;
     }
     
+    /**
+     * This function controls PDF rendering to a graphics context that can be
+     * used for printing
+     * 
+     * @param graphics The target graphics context
+     * @param pageFormat The desired pageFormat
+     * @param pageIndex The page index currently being processed
+     * @return PAGE_EXISTS on success
+     * @throws PrinterException
+     */
     public int printPDFRenderer(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
         /*
          * Important:  This uses class reflection to instantiate and invoke
