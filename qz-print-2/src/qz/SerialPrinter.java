@@ -96,11 +96,11 @@ public class SerialPrinter implements Printer {
     }
 
     public void printRaw(ByteArrayBuilder data) throws PrintException {
-        LogIt.log("Serial Printer does not support raw printing.");
+        LogIt.log(Level.WARNING, "Serial Printer does not support raw printing.");
     }
 
     public void printAlternate(ByteArrayBuilder data) throws PrintException {
-        LogIt.log("Serial Printer does not support alternate printing.");
+        LogIt.log(Level.WARNING, "Serial Printer does not support alternate printing.");
     }
 
     public boolean ready() {
@@ -108,11 +108,11 @@ public class SerialPrinter implements Printer {
     }
 
     public void setPrintService(PrintService ps) {
-        LogIt.log("Serial Printer does not require a print service.");
+        LogIt.log(Level.WARNING, "Serial Printer does not require a print service.");
     }
 
     public PrintService getPrintService() {
-        LogIt.log("Serial Printer does not require a print service.");
+        LogIt.log(Level.WARNING, "Serial Printer does not require a print service.");
         return null;
     }
 
@@ -170,7 +170,7 @@ public class SerialPrinter implements Printer {
                         port.openPort();
                     } catch (SerialPortException ex) {
                         port = null;
-                        LogIt.log(ex);
+                        LogIt.log(Level.SEVERE, "Could not open serial port.", ex);
                     }
                     return null;
                 }
@@ -184,7 +184,7 @@ public class SerialPrinter implements Printer {
                     }
                 });
             } catch (SerialPortException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not add listener to serial port.", ex);
             }
             
             this.portName = portName;
@@ -214,7 +214,7 @@ public class SerialPrinter implements Printer {
         try {
             closed = port.closePort();
         } catch (SerialPortException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not close serial port.", ex);
         }
         
         if (!closed) {
@@ -281,14 +281,14 @@ public class SerialPrinter implements Printer {
                         port.writeBytes(getInputBuffer().getByteArray());
                         getInputBuffer().clear();
                     } catch (SerialPortException ex) {
-                        LogIt.log(ex);
+                        LogIt.log(Level.SEVERE, "Could not send data to serial port.", ex);
                     }
                     return null;
                 }
             });
         }
         else {
-            LogIt.log("Error. Serial port not opened.");
+            LogIt.log(Level.SEVERE, "No serial port is open.");
         }
     }
 
@@ -331,10 +331,10 @@ public class SerialPrinter implements Printer {
             LogIt.log("Found Serial Ports: " + serialPorts);
         }
         catch (NullPointerException ex) {
-            LogIt.log("NullPointerException: " + ex);
+            LogIt.log(Level.SEVERE, "Null pointer.", ex);
         }
         catch (NoClassDefFoundError ex) {
-            LogIt.log("NoClassDefFoundError: " + ex);
+            LogIt.log(Level.SEVERE, "Problem communicating with the JSSC class.", ex);
         }
     }
 
@@ -355,7 +355,6 @@ public class SerialPrinter implements Printer {
                 if (beginPos.length > 0 && endPos.length > 0) {
                     int _begin = beginPos[beginPos.length -1];
                     int _end  = endPos[endPos.length -1];
-                    LogIt.log(new String(getOutputBuffer().getByteArray(), _begin, _end - _begin));
                     output = new byte[_end - _begin];
                     System.arraycopy(getOutputBuffer().getByteArray(), _begin, output, 0, _end - _begin);
                     getOutputBuffer().clear();
@@ -366,7 +365,7 @@ public class SerialPrinter implements Printer {
                     btools.notifyBrowser("qzSerialReturned", new String(output));
                 }
                 else {
-                    LogIt.log("Received serial data but it was null. Please check the begin and end characters.");
+                    LogIt.log(Level.WARNING, "Received serial data but it was null. Please check the begin and end characters.");
                 }
             }
         } catch (SerialPortException e) {

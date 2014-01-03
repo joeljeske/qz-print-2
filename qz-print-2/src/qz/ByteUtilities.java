@@ -277,42 +277,4 @@ public class ByteUtilities {
             return out.toByteArray();
         }
     }
-
-
-
-    /**
-     * Alternative to getHex(). Not used. Converts a <code>byte[]</code> to a
-     * Hexadecimal (base 16) String representation. i.e. { 0x1B, 0x00 } would
-     * look like this: "1B00"
-     *
-     * @param b
-     * @return
-     * @throws Exception
-     */
-    /*public static String getHexString(byte[] b) throws Exception {
-     String result = "";
-     for (int i = 0; i < b.length; i++) {
-     result +=
-     Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
-     }
-     return result;
-     }*/
 }
-
-/*if (offset > 0 && end > 0 && end > offset
-
-    
- ) { 
- //LogIt.log("Start: " + offset + ": " + orig[offset] + ", End: " + end + ": " + orig[end]);
- byte[] printBytes = new byte[end - offset];
- int counter = 0;
- for (int i = offset; i < end; i++) {
- printBytes[counter++] = orig[i];
- }
- doc = new SimpleDoc(printBytes, docFlavor.get(), docAttr.get());
- }
-
-    
- else {
- doc = new SimpleDoc(orig, docFlavor.get(), docAttr.get());
- }*/

@@ -24,6 +24,7 @@ package qz;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Level;
 import javax.print.PrintException;
 import javax.print.PrintService;
 import qz.exception.InvalidFileTypeException;
@@ -95,7 +96,7 @@ public class FilePrinter implements Printer {
     }
 
     public void printAlternate(ByteArrayBuilder data) throws PrintException {
-        LogIt.log("Cannot use alternate printing on a File printer.");
+        LogIt.log(Level.WARNING, "Cannot use alternate printing on a File printer.");
     }
 
     // Empty function. FilePrinter's should never have a ps set

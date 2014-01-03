@@ -78,12 +78,13 @@ public class PrintJob extends JLabel implements Runnable, Printable {
         this.autoSize = false;
         
         while(running) {
-            try {
-                Thread.sleep(updateDelay);
+            /*try {
+                
             } catch (InterruptedException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "PrintJob process was interrupted.", ex);
                 running = false;
             }
+            */
         }
     }
     
@@ -125,8 +126,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             PrintJobElement pje = new PrintJobElement(this, appendData, PrintJobElementType.TYPE_RAW, charset);
             rawData.add(pje);
         }
-        catch(NullPointerException e) {
-            LogIt.log(e);
+        catch(NullPointerException ex) {
+            LogIt.log(Level.SEVERE, "Could not append data.", ex);
         }
     }
     
@@ -145,8 +146,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             PrintJobElement pje = new PrintJobElement(this, imagePath, PrintJobElementType.TYPE_IMAGE, charset, lang, imageX, imageY);
             rawData.add(pje);
         }
-        catch(NullPointerException e) {
-            LogIt.log(e);
+        catch(NullPointerException ex) {
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
     }
     
@@ -164,8 +165,8 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             PrintJobElement pje = new PrintJobElement(this, imagePath, PrintJobElementType.TYPE_IMAGE, charset, lang, dotDensity);
             rawData.add(pje);
         }
-        catch(NullPointerException e) {
-            LogIt.log(e);
+        catch(NullPointerException ex) {
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
     }
     
@@ -250,7 +251,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                 PrintJobElement pje = (PrintJobElement) dataIterator.next();
                 pje.prepare();
             } catch (IOException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not prepare job.", ex);
             }
         }
         
@@ -286,12 +287,12 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                     info = new String(bytes.getByteArray(), pje.getCharset().name());
                     jobInfo += info;
                 } catch (UnsupportedEncodingException ex) {
-                    LogIt.log(ex);
+                    LogIt.log(Level.SEVERE, "Unsupported encoding.", ex);
                 }
             }
         }
         else {
-            LogIt.log("Error: Unsupported job type.");
+            LogIt.log(Level.WARNING, "Unsupported job type.");
         }
         
         return jobInfo;
@@ -331,7 +332,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                     printer.printRaw(jobData);
                 }
             } catch (PrintException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not print raw job.", ex);
             }
         }
         else if(type == PrintJobType.TYPE_HTML) {
@@ -362,7 +363,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                 }
                 jobDataString += "</html>";
             } catch (UnsupportedEncodingException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Unsupported encoding.", ex);
             }
             
             this.setText(jobDataString);
@@ -379,7 +380,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             try {
                 job.setPrintService(printer.getPrintService());
             } catch (PrinterException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not print HTML job.", ex);
             }
             
             if(logPSFeatures) {
@@ -391,7 +392,7 @@ public class PrintJob extends JLabel implements Runnable, Printable {
             try {
                 job.print(attr);
             } catch (PrinterException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not print HTML job.", ex);
             }
             j.setVisible(false);
             j.dispose();
@@ -444,13 +445,13 @@ public class PrintJob extends JLabel implements Runnable, Printable {
                 job.print(attr);
 
             } catch (PrinterException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
             } catch (IndexOutOfBoundsException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
             }            
         }
         else {
-            LogIt.log("Error: Unsupported job type.");
+            LogIt.log(Level.WARNING, "Unsupported job type.");
         }
             
         state = PrintJobState.STATE_COMPLETE;
@@ -557,9 +558,9 @@ public class PrintJob extends JLabel implements Runnable, Printable {
     
     @SuppressWarnings("unchecked")
     private void logSupportedPrinterFeatures(PrinterJob job) {
-        LogIt.log(Level.INFO, "Supported Printing Attributes:");
+        LogIt.log("Supported Printing Attributes:");
         for (Class<?> cl : job.getPrintService().getSupportedAttributeCategories()) {
-            LogIt.log(Level.INFO, "   Attr type = " + cl + "=" + job.getPrintService().getDefaultAttributeValue((Class<? extends Attribute>) cl));
+            LogIt.log("   Attr type = " + cl + "=" + job.getPrintService().getDefaultAttributeValue((Class<? extends Attribute>) cl));
         }
     }
 

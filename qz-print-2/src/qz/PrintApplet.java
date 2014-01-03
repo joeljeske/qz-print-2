@@ -165,7 +165,7 @@ public class PrintApplet extends Applet {
             return printerListString;
         }
         catch(NullPointerException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.WARNING, "Could not get printer list.", ex);
             return "";
         }
         
@@ -191,7 +191,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(data, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append data.", ex);
         }
         spooler.append(bytes, charset);
         // Deprecated callback. Remove in a future version.
@@ -210,7 +210,7 @@ public class PrintApplet extends Applet {
         try {
             base64Array = Base64.decode(base64);
         } catch (IOException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append data.", ex);
         }
         
         ByteArrayBuilder data = new ByteArrayBuilder(base64Array);
@@ -245,7 +245,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(imagePath, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
         spooler.appendImage(bytes, charset, lang, 0, 0);
         // Deprecated callback. Remove in a future version.
@@ -266,7 +266,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(imagePath, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
         spooler.appendImage(bytes, charset, lang, imageX, imageY);
         // Deprecated callback. Remove in a future version.
@@ -312,7 +312,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(imagePath, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
         spooler.appendImage(bytes, charset, lang, dotDensity);
         // Deprecated callback. Remove in a future version.
@@ -330,7 +330,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(url, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append image.", ex);
         }
         spooler.appendPSImage(bytes, charset);
         // Deprecated callback. Remove in a future version.
@@ -350,7 +350,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(url, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append XML.", ex);
         }
         spooler.appendXML(bytes, charset, xmlTag);
         // Deprecated callback. Remove in a future version.
@@ -369,7 +369,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(url, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not append file.", ex);
         }
         spooler.appendFile(bytes, charset);
         // Deprecated callback. Remove in a future version.
@@ -387,7 +387,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(html, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "HTML could not be appended.", ex);
         }
         spooler.appendHTML(bytes, charset);
         // Deprecated callback. Remove in a future version.
@@ -405,7 +405,7 @@ public class PrintApplet extends Applet {
         try {
             bytes.append(url, charset);
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "PDF File could not be appended.", ex);
         }
         spooler.appendPDF(bytes, charset);
         // Deprecated callback. Remove in a future version.
@@ -423,7 +423,7 @@ public class PrintApplet extends Applet {
             LogIt.log("Print Successful");
         }
         else {
-            LogIt.log("Print Failed");
+            LogIt.log(Level.WARNING, "Print Failed");
         }
         btools.notifyBrowser("qzDonePrinting");
         return success;

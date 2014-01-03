@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Locale;
+import java.util.logging.Level;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
 import javax.print.PrintException;
@@ -108,14 +109,14 @@ public class RawPrinter implements Printer {
         try {
             pj.print(doc, reqAttr);
         } catch (PrintException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Raw print error.", ex);
         }
 
         while (!isFinished) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Raw print process interrupted.", ex);
             }
         }
 
@@ -160,7 +161,7 @@ public class RawPrinter implements Printer {
             socket.close();
         }
         catch (IOException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not print to host.", ex);
         }
         
     }

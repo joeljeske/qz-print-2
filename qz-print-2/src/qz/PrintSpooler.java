@@ -33,6 +33,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.logging.Level;
 import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
@@ -302,7 +303,7 @@ public class PrintSpooler implements Runnable {
                 try {
                     bytes.append(dataString, charset);
                 } catch (UnsupportedEncodingException ex) {
-                    LogIt.log(ex);
+                    LogIt.log(Level.SEVERE, "Unsupported encoding.", ex);
                 }
                 currentJob.append(bytes, charset);
                 currentJob = null;
@@ -362,7 +363,7 @@ public class PrintSpooler implements Runnable {
         lastPrinterName = currentPrinter.getName();
         
         if(openJobs == 0) {
-            LogIt.log("No data has been provided.");
+            LogIt.log(Level.WARNING, "No data has been provided.");
             setException(new NullCommandException("No data has been provided."));
             return false;
         }
@@ -372,11 +373,11 @@ public class PrintSpooler implements Runnable {
                 currentJob.prepareJob();
             }
             catch (InvalidRawImageException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Raw image error.", ex);
                 setException(ex);
             }
             catch (NullCommandException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "No data has been provided.", ex);
                 setException(ex);
             }
             currentJob = null;
@@ -392,11 +393,11 @@ public class PrintSpooler implements Runnable {
                         job.prepareJob();
                     }
                     catch (InvalidRawImageException ex) {
-                        LogIt.log(ex);
+                        LogIt.log(Level.SEVERE, "Raw image error.", ex);
                         setException(ex);
                     }
                     catch (NullCommandException ex) {
-                        LogIt.log(ex);
+                        LogIt.log(Level.SEVERE, "No data has been provided.", ex);
                         setException(ex);
                     }
                     openJobs -= 1;
@@ -420,19 +421,19 @@ public class PrintSpooler implements Runnable {
                 currentJob.setPrinter(filePrinter);
                 currentJob.prepareJob();
             } catch (InvalidRawImageException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Raw image error.", ex);
                 setException(ex);
             } catch (NullCommandException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "No data has been provided.", ex);
                 setException(ex);
             } catch (InvalidFileTypeException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Invalid file type.", ex);
                 setException(ex);
             }
             currentJob = null;
         }
         else {
-            LogIt.log("No data has been provided.");
+            LogIt.log(Level.SEVERE, "No data has been provided.");
             setException(new NullCommandException("No data has been provided."));
         }
     }
@@ -450,16 +451,16 @@ public class PrintSpooler implements Runnable {
             try {
                 currentJob.prepareJob();
             } catch (InvalidRawImageException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Raw image error.", ex);
                 setException(ex);
             } catch (NullCommandException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "No data has been provided.", ex);
                 setException(ex);
             }
             currentJob = null;
         }
         else {
-            LogIt.log("No data has been provided.");
+            LogIt.log(Level.SEVERE, "No data has been provided.");
             setException(new NullCommandException("No data has been provided."));
         }
     }
@@ -606,7 +607,7 @@ public class PrintSpooler implements Runnable {
             LogIt.log("Found printer \"" + currentPrinter.getName() + "\".");
         }
         else {
-            LogIt.log("Could not find printer with name containing \"" + printerName + "\".");
+            LogIt.log(Level.WARNING, "Could not find printer with name containing \"" + printerName + "\".");
         }
     }
 
@@ -725,9 +726,9 @@ public class PrintSpooler implements Runnable {
             file = new String(url.getByteArray(), charset.name());
             data = new String(FileUtilities.readRawFile(file), charset.name());
         } catch (UnsupportedEncodingException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Unsupported encoding.", ex);
         } catch (IOException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Could not retrieve file data.", ex);
         }
         
         return data;
@@ -742,11 +743,11 @@ public class PrintSpooler implements Runnable {
             try {
                 networkUtilities = new NetworkUtilities();
             } catch (SocketException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Socket error.", ex);
             } catch (ReflectException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Reflection error.", ex);
             } catch (UnknownHostException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Unknown host.", ex);
             }
         }
         
@@ -755,9 +756,9 @@ public class PrintSpooler implements Runnable {
                 try {
                     networkUtilities.gatherNetworkInfo();
                 } catch (IOException ex) {
-                    LogIt.log(ex);
+                    LogIt.log(Level.SEVERE, "Could not gather network info.", ex);
                 } catch (ReflectException ex) {
-                    LogIt.log(ex);
+                    LogIt.log(Level.SEVERE, "Reflection error.", ex);
                 }
                 return null;
             }

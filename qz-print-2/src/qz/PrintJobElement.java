@@ -39,6 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.DOMException;
@@ -155,7 +156,7 @@ public class PrintJobElement {
             try {
                 this.data = new ByteArrayBuilder(iw.getImageCommand());
             } catch (UnsupportedEncodingException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Unsupported encoding.", ex);
             }
         }
         else if(type == PrintJobElementType.TYPE_IMAGE_PS) {
@@ -178,11 +179,11 @@ public class PrintJobElement {
                 dataByteArray = Base64.decode(dataString);
                 data = new ByteArrayBuilder(dataByteArray);
             } catch (DOMException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not prepare XML element.", ex);
             } catch (ParserConfigurationException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not prepare XML element.", ex);
             } catch (SAXException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not prepare XML element.", ex);
             }
         }
         else if(type == PrintJobElementType.TYPE_FILE) {
@@ -195,7 +196,7 @@ public class PrintJobElement {
             try {
                 pdfFile = getPDFFile();
             } catch (PrinterException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not prepare PDF element.", ex);
             }
         }
 
@@ -261,7 +262,7 @@ public class PrintJobElement {
             try {    
                 pdfFile = new PDFFile(this.bufferedPDF);
             } catch (IOException ex) {
-                LogIt.log(ex);
+                LogIt.log(Level.SEVERE, "Could not get PDF file.", ex);
             }
         }
         
@@ -289,7 +290,7 @@ public class PrintJobElement {
         int pg = pageIndex + 1;
         
         if (pdf == null) {
-        throw new PrinterException("No PDF data specified");
+            throw new PrinterException("No PDF data specified");
         }
         
         // fit the PDFPage into the printing area
@@ -303,7 +304,7 @@ public class PrintJobElement {
         try {
             page.waitForFinish();
         } catch (InterruptedException ex) {
-            LogIt.log(ex);
+            LogIt.log(Level.SEVERE, "Printing was interrupted.", ex);
         }
         pgs.run();
         

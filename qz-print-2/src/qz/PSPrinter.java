@@ -21,6 +21,7 @@
  */
 package qz;
 
+import java.util.logging.Level;
 import javax.print.DocFlavor;
 import javax.print.PrintException;
 import javax.print.PrintService;
@@ -47,11 +48,11 @@ public class PSPrinter implements Printer {
     }
 
     public void printRaw(ByteArrayBuilder data) throws PrintException {
-        LogIt.log("Cannot print raw job to PostScript printer.");
+        LogIt.log(Level.WARNING, "Cannot print raw job to PostScript printer.");
     }
 
     public void printAlternate(ByteArrayBuilder data) throws PrintException {
-        LogIt.log("Cannot use alternate printing on a PostScript printer.");
+        LogIt.log(Level.WARNING, "Cannot use alternate printing on a PostScript printer.");
     }
         
     public boolean ready() {
