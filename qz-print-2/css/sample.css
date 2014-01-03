@@ -30,6 +30,28 @@ input {
 	padding: 5px;
 	border: 1px solid #666;
 	margin-bottom: 10px;
+	width: 100%;
+}
+input[type=text] {
+	width: 196px;
+}
+input#find-printer {
+	width: 92px;
+}
+input#open_port {
+	width: 91px;
+}
+input#printer, input#port_name {
+	width: 101px;
+}
+input.one-third-width {
+	width: 67px;
+}
+
+applet {
+	position: absolute;
+	bottom: 0;
+	right: 0;
 }
 
 a.button {

@@ -1,204 +1,83 @@
 <!DOCTYPE html>
 <html>
 <!-- License:  LGPL 2.1 or QZ INDUSTRIES SOURCE CODE LICENSE -->
-
 <head>
 	<title>QZ Print Plugin</title>
-	
 	<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
 	<script type="text/javascript" src="js/html2canvas.js"></script>
 	<script type="text/javascript" src="js/jquery.plugin.html2canvas.js"></script>	
-	<script type="text/javascript" src="js/deployJava.js"></script>
-	<script type="text/javascript" src="js/sample.js"></script>
-	
 	<link href="css/sample.css" rel="stylesheet" />
-	
 </head>
-
-
-
 <body id="content">
 	<div id="wrapper">
-		<div style="position:absolute;top:0;left:5;"><h1 id="title">QZ Print Plugin</h1></div><br /><br /><br />
-	
-
+		<h1 id="title">QZ Print Plugin</h1><br />
 		<table border="1px" cellpadding="5px" cellspacing="0px">
 			<tr>
 				<td valign="top">
 					<h2>All Printers</h2>
-					<input type="button" onClick="findPrinter()" value="Detect Printer">
-					<br />
-					<input id="printer" type="text" value="zebra" size="15">
-					<br />
-					<input type="button" onClick="findPrinters()" value="List All Printers">
-					<br />
-					<input type="button" onClick="useDefaultPrinter()" value="Use Default Printer">
-					<br />
-					<br />
-					<div id="loaded">
-						Loading...
-					</div>
-
+					<input id="find-printer" type="button" onClick="findPrinter()" value="Detect Printer">
+					<input id="printer" type="text" value="zebra" size="15"><br />
+					<input type="button" onClick="findPrinters()" value="List All Printers"><br />
+					<input type="button" onClick="useDefaultPrinter()" value="Use Default Printer"><br /><br />
+					<div id="loaded">Loading...</div>
 				</td>
 				<td valign="top">
-					<h2>Raw Printers Only</h2>
-					<a href="http://qzindustries.com/WhatIsRawPrinting" target="new">What is Raw Printing?</a>
-					<br />
-					<br />
-					<input type="button" onClick="printEPL()" value="Print EPL" />
-					<br />
-					<input type="button" onClick="printZPL()" value="Print ZPL" />
-					<br />
-					<br />
-					<input type="button" onClick="printESCP()" value="Print ESCP" />
-					<br />
-					<a href="javascript:findPrinter('Epson');">Epson</a>&nbsp; 
-					<a href="javascript:findPrinter('Citizen');">Citizen</a>&nbsp; 
-					<a href="javascript:findPrinter('Star');">Star</a>
-					<br />
-					<br />
-					<input type="button" onClick="printEPCL()" value="Print EPCL" /><br />
-					(Zebra Card Printer)<br /><br />
-					<input type="button" onClick="print64()" value="Print Base64" />
-					<br />
-					<input type="button" onClick="printPages()" value="Print Spooling Every 2" />
-					<br />
-					<input type="button" onClick="printXML()" value="Print XML" />
-					<br />
-					<input type="button" onClick="printHex()" value="Print Hex" />
-					<br />
-					<br />
-					<input type="button" onClick="printFile('zpl_sample.txt')" value="zpl_sample.txt" />
-					<br />
-					<input type="button" onClick="printFile('fgl_sample.txt')" value="fgl_sample.txt" />
-					<br />
-					<input type="button" onClick="printFile('epl_sample.txt')" value="epl_sample.txt" />
-					<br />
-					<br />
-					<input type="button" onClick="printToFile()" value="Print To File" />
-					<br />
-					<input type="button" onClick="printToHost()" value="Print To Host" />
-					<br />
-					<input type="button" onClick="useAlternatePrinting()" value="Use Alternate Printing" />
-					<br />
-				</td>
-				<td valign="top">
-					<h2>PostScript Printers Only</h2>
-					<a href="http://qzindustries.com/WhatIsPostScriptPrinting" target="new">What is PostScript Printing?</a>
-					<br />
-					<p>First find 
-						<a href="javascript:findPrinter('XPS');">Microsoft XPS</a>or 
-						<a href="javascript:findPrinter('PDF');">PDF</a>printer
-					</p>
-					<input type="button" onClick="printHTML()" value="Print HTML" />
-					<br />
-					<input type="button" onClick="printPDF()" value="Print PDF" />
-					<br />
-					<input type="button" onClick="printImage(false)" value="Print PostScript Image" />
-					<br />
-					<input type="button" onClick="printImage(true)" value="Print Scaled PostScript Image" />
-					<br />
-					<input type="button" onClick="printHTML5Div()" value="Print Current Page" />
-					<br />
-					<input type="button" onClick="logFeatures()" value="Log Printer Features on Print" />
-					<br />
-				</td>
-				<td valign="top">
-					<h2>Serial</h2>
-					<input type="button" id="list_ports" onClick="listSerialPorts()" value="List Serial Ports" />
-					<br />
-					<input type=text id="port_name" size="8" />
-					<input type="button" id="open_port" onClick="openSerialPort()" value="Open Port" />
-					<br />
-					<input type="button" id="send_data" onClick="sendSerialData()" value="Send Port Cmd" />
-					<br />
-					<input type="button" id="close_port" onClick="closeSerialPort()" value="Close Port" />
-					<br />
-					<hr />
-					<h2>Misc</h2>
-					<input type="button" onClick="listNetworkInfo()" value="List Network Info" />
-					<br />
-					<input type="button" onClick="allowMultiple()" value="Allow Multiple Applets" />
-					<br />
-				</td>
-			</tr>
-		</table>
-		
-		<!--<table>
-			<tr>
-				<td>
-					<h2>All Printers</h2>
-					<a class="button" href="javascript:findPrinter()">Detect Printer</a><br />
-					<input id="printer" type="text" value="zebra" size="15" /><br />
-					<a class="button" href="javascript:findPrinters()">List All Printers</a><br />
-					<a class="button" href="javascript:useDefaultPrinter()">Use Default Printer</a><br />
-					<br />
-					<div id="applet">
-						<p>Applet:</p>
-						<applet id="qz" archive="./qz-print-2.jar" name="QZ Print Plugin 2" code=
-							"qz.PrintApplet.class" width="55" height="55">
-							<param name="jnlp_href" value="qz-print-2_jnlp.jnlp" />
-							<param name="cache_option" value="plugin" />
-							<param name="disable_logging" value="false" />
-							<param name="initial_focus" value="false" />
-						</applet>
-					</div>
-					<hr>
-					<div id="loaded">
-						Loading...
-					</div>
-				</td>
-
-				<td>
 					<h2>Raw Printers</h2>
-					<a href="http://code.google.com/p/jzebra/wiki/WhatIsRawPrinting" target="new">What is Raw Printing?</a><br /><br />
-					<a class="button" href="javascript:print()">Print</a>&nbsp;
-					<a class="button" href="javascript:print64()">Print Base64</a><br />
-					<a class="button" href="javascript:printPages()">Print Spooling Every 2</a><br />
-					<a class="button" href="javascript:printXML()">Print XML</a>&nbsp;
-					<a class="button" href="javascript:printHex()">Print Hex</a><br />
-					<strong>Print File:</strong><br />
-					<a class="button" href="javascript:printFile('zpl_sample.txt')">ZPL</a>&nbsp;
-					<a class="button" href="javascript:printFile('fgl_sample.txt')">FGL</a>&nbsp;
-					<a class="button" href="javascript:printFile('epl_sample.txt')">EPL</a><br />
-					<a class="button" href="javascript:printESCPImage()">Print ESC/POS Image</a><br />
-					<a class="button" href="javascript:printZPLImage()">Print ZPL Image</a><br />
-					<a class="button" href="javascript:printToFile()">Print To File</a>&nbsp;
-					<a class="button" href="javascript:printToHost()">Print To Host</a><br />
-					<a class="button" href="javascript:useAlternatePrinting()">Use Alternate Printing</a><br />
+					<a href="http://qzindustries.com/WhatIsRawPrinting" target="new">What is Raw Printing?</a><br /><br />
+					<p>Find Printer:</p>
+						<a href="javascript:findPrinter('Zebra');">Zebra</a>&nbsp; 
+						<a href="javascript:findPrinter('Epson');">Epson</a>&nbsp; 
+						<a href="javascript:findPrinter('Citizen');">Citizen</a>&nbsp; 
+						<a href="javascript:findPrinter('Star');">Star</a><br /><br />
+					<p>Print raw data:</p>
+						<input class='one-third-width' type="button" onClick="printZPL()" value="ZPL" />
+						<input class='one-third-width' type="button" onClick="printEPL()" value="EPL" />
+						<input class='one-third-width' type="button" onClick="printESCP()" value="ESCP" /><br />
+					<input type="button" onClick="printEPCL()" value="Print EPCL" /><br />(Zebra Card Printer)<br /><br />
+					<input type="button" onClick="print64()" value="Print Base64" /><br />
+					<input type="button" onClick="printPages()" value="Print Spooling Every 2" /><br />
+					<input type="button" onClick="printXML()" value="Print XML" /><br />
+					<input type="button" onClick="printHex()" value="Print Hex" /><br /><br />
+					<p>Print from file:</p>
+						<input class='one-third-width' type="button" onClick="printFile('zpl_sample.txt')" value="ZPL" />
+						<input class='one-third-width' type="button" onClick="printFile('fgl_sample.txt')" value="FGL" />
+						<input class='one-third-width' type="button" onClick="printFile('epl_sample.txt')" value="EPL" /><br /><br />
+					<input type="button" onClick="printToFile()" value="Print To File" /><br />
+					<input type="button" onClick="printToHost()" value="Print To Host" /><br />
+					<input type="button" onClick="useAlternatePrinting()" value="Use Alternate Printing" />
 				</td>
-
-				<td>
+				<td valign="top">
 					<h2>PostScript Printers</h2>
-					<a href="http://code.google.com/p/jzebra/wiki/WhatIsPostScriptPrinting" target="new">What is PostScript Printing?</a><br /><br />
-					<a class="button" href="javascript:printHTML()">Print HTML</a><br />
-					<a class="button" href="javascript:printPDF()">Print PDF</a><br />
-					<a class="button" href="javascript:printImage(false)">Print PostScript Image</a><br />
-					<a class="button" href="javascript:printImage(true)">Print Scaled PostScript Image</a><br />
-					<a class="button" href="javascript:printPage()">Print Current Page</a><br />
+					<a href="http://qzindustries.com/WhatIsPostScriptPrinting" target="new">What is PostScript Printing?</a><br /><br />
+					<p>Find Printer:</p>
+						<a href="javascript:findPrinter('XPS');">Microsoft XPS</a> 
+						<a href="javascript:findPrinter('PDF');">PDF</a><br /><br />
+					<input type="button" onClick="printHTML()" value="Print HTML" /><br />
+					<input type="button" onClick="printPDF()" value="Print PDF" /><br />
+					<input type="button" onClick="printImage(false)" value="Print PostScript Image" /><br />
+					<input type="button" onClick="printImage(true)" value="Print Scaled PostScript Image" /><br />
+					<input type="button" onClick="printHTML5Div()" value="Print Current Page" /><br />
+					<input type="button" onClick="logFeatures()" value="Log Printer Features on Print" /><br />
 				</td>
-
-				<td>
+				<td valign="top">
 					<h2>Serial</h2>
-					<a class="button" href="javascript:listSerialPorts()">List Serial Ports</a><br />
-					<input type="text" id="port_name" size="8" />
-					<a class="button" href="javascript:openSerialPort()">Open Port</a><br />
-					<a class="button" href="javascript:sendSerialData()">Send Port Cmd</a><br />
-					<a class="button" href="javascript:closeSerialPort()">Close Port</a><br />
-					<hr />
+					<input type="button" id="list_ports" onClick="listSerialPorts()" value="List Serial Ports" /><br />
+					<input type="button" id="open_port" onClick="openSerialPort()" value="Open Port" />
+					<input type="text" id="port_name" size="8" /><br />
+					<input type="button" id="send_data" onClick="sendSerialData()" value="Send Port Cmd" /><br />
+					<input type="button" id="close_port" onClick="closeSerialPort()" value="Close Port" /><br />
 
 					<h2>Misc</h2>
-					<a class="button" href="javascript:listNetworkInfo()">List Network Info</a><br />
-					<a class="button" href="javascript:allowMultiple()">Allow Multiple Applets</a><br />
+					<input type="button" onClick="listNetworkInfo()" value="List Network Info" /><br />
 				</td>
 			</tr>
 		</table>
-		-->
-		
 		<br />
 		<h2>Spool Info</h2>
 		<div id="queueInfo"></div>
 	</div>
 <canvas id="hidden_screenshot" style="display:none;"></canvas>
+<script type="text/javascript" src="js/deployJava.js"></script>
+<script type="text/javascript" src="js/sample.js"></script>
 </body>
 </html>
