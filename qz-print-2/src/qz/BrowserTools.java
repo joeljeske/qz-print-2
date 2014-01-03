@@ -67,7 +67,13 @@ public class BrowserTools {
                     + function + "(...)\"...");
             
             // Check for deprecated function use and log an appropriate warning
-            if (function.equals("qzDoneAppending") || 
+            if (function.startsWith("jzebra")) {
+                LogIt.log(Level.WARNING, "JavaScript function \"" + function
+                        + "(...)\" is deprecated and will be removed in future releases. "
+                        + "Please use \"" + function.replaceFirst("jzebra", "qz")
+                        + "(...)\" instead.");
+            }
+            else if (function.equals("qzDoneAppending") || 
                      function.equals("qzDoneFinding") || 
                      function.equals("qzDoneFindingNetwork")) {
                 LogIt.log(Level.WARNING, "JavaScript function \"" + function + "(...)\" is deprecated and will be removed in future releases.");
@@ -80,9 +86,13 @@ public class BrowserTools {
                 // Try to call the old jzebra function
                 success = notifyBrowser(function.replaceFirst("qz", "jzebra"), o);
             }
-            // Warn about the function missing only if its not a deprecated 
-            // javascript function from the qz set
-            if (!success && 
+            if (function.equals("jebraDoneFinding")) {
+                // Try to call yet another deprecated jzebra function
+                success = notifyBrowser("jzebraDoneFindingPrinters", o);
+            }
+            // Warn about the function missing only if it wasn't recovered using the old jzebra name
+            // or it's a deprecated javascript function from the qz set
+            if (!success && !function.startsWith("jzebra") &&
                 !function.equals("qzDoneAppending") && 
                 !function.equals("qzDoneFinding") && 
                 !function.equals("qzDoneFindingNetwork")) {
