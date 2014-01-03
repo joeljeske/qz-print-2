@@ -74,7 +74,7 @@ public class BrowserTools {
             }
             
             return true;
-        } catch (JSException e) {
+        } catch (JSException e) { 
             boolean success = false;
             if (function.startsWith("qz")) {
                 // Try to call the old jzebra function

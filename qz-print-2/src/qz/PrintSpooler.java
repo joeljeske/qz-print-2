@@ -578,7 +578,6 @@ public class PrintSpooler implements Runnable {
         else {
             LogIt.log("Could not find printer with name containing \"" + printerName + "\".");
         }
-        
     }
 
     /**
