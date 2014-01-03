@@ -552,22 +552,52 @@ public class PrintSpooler implements Runnable {
         
         currentPrinter = null;
         
-        ListIterator<Printer> iterator = printerList.listIterator();
-        
-        while(iterator.hasNext()) {
-            
-            Printer printer = iterator.next();
-            if(printerName == null) {
+        // If printer name is null, get default printer
+        if(printerName == null) {
+            ListIterator<Printer> iterator = printerList.listIterator();
+            while(iterator.hasNext()) {
+                Printer printer = iterator.next();
                 PrintService defaultPS = PrintServiceLookup.lookupDefaultPrintService();
                 if(printer.getPrintService().equals(defaultPS)) {
                     currentPrinter = printer;
                     break;
                 }
             }
-            else {
-                if(printer.getName().toLowerCase().indexOf(printerName.toLowerCase()) != -1) {
+        }
+        else {
+            // Do a 3 pass compare to match the printer. Look for an exact match
+            // then a match containing the string, then a lowercase match 
+            // containing the string
+            
+            // First Pass - exact match
+            ListIterator<Printer> exactMatch = printerList.listIterator();
+            while(exactMatch.hasNext()) {
+                Printer printer = exactMatch.next();
+                if(printer.getName().equals(printerName)) {
                     currentPrinter = printer;
                     break;
+                }
+            }
+            // Second Pass (if needed) - contains match
+            if(currentPrinter == null) {
+                ListIterator<Printer> containsMatch = printerList.listIterator();
+                while(containsMatch.hasNext()) {
+                    Printer printer = containsMatch.next();
+                    if(printer.getName().indexOf(printerName) != -1) {
+                        currentPrinter = printer;
+                        break;
+                    }
+                }
+            }
+            // Third Pass (if needed) - lowercase contains match
+            if(currentPrinter == null) {
+                ListIterator<Printer> containsMatch = printerList.listIterator();
+                while(containsMatch.hasNext()) {
+                    Printer printer = containsMatch.next();
+                    if(printer.getName().toLowerCase().indexOf(printerName.toLowerCase()) != -1) {
+                        currentPrinter = printer;
+                        break;
+                    }
                 }
             }
         }
