@@ -250,6 +250,7 @@ function printEPL() {
 	qz.append('A310,116,0,3,1,1,N,"FROM SAMPLE.HTML"\n');
 	qz.append('A310,146,0,3,1,1,N,"QZINDUSTRIES.COM"\n');
 	qz.appendImage(getPath() + 'img/image_sample_bw.png', 'EPL', 150, 300);
+	qz.append('\nP1,1\n');
 
 	// Tell the applet to print.
 	qz.print();
