@@ -400,55 +400,61 @@ public class PrintJob extends JLabel implements Runnable, Printable {
         }
         else if(type == PrintJobType.TYPE_PS) {
             
-            try {
-                
-                PrintJobElement firstElement = rawData.get(0);
-                PrinterJob job = PrinterJob.getPrinterJob();
-                
-                if(logPSFeatures) {
-                    logSupportedPrinterFeatures(job);
-                }
-                
-                int w;
-                int h;
+            // If printer is a raw printer, log an error and bypass printing.
+            if(printer instanceof RawPrinter) {
+                LogIt.log(Level.WARNING, "PostScript data can not be sent to a raw printer.");
+            }
+            else {
+                try {
 
-                if (firstElement.getBufferedImage() != null) {
-                    w = firstElement.getBufferedImage().getWidth();
-                    h = firstElement.getBufferedImage().getHeight();
-                } 
-                else if (firstElement.getPDFFile() != null) {
-                    w = (int) firstElement.getPDFFile().getPage(1).getWidth();
-                    h = (int) firstElement.getPDFFile().getPage(1).getHeight();
-                }
-                else {
-                    throw new PrinterException("Corrupt or missing file supplied.");
-                }
-                
-                HashPrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-                
-                if (paperSize != null) {
-                    attr.add(paperSize.getOrientationRequested());
-                    if (paperSize.isAutoSize()) {
-                        if(rawData.get(0).getType() == PrintJobElementType.TYPE_IMAGE_PS) {
-                            paperSize.setAutoSize(rawData.get(0).getBufferedImage());
-                        }
+                    PrintJobElement firstElement = rawData.get(0);
+                    PrinterJob job = PrinterJob.getPrinterJob();
+
+                    if(logPSFeatures) {
+                        logSupportedPrinterFeatures(job);
                     }
-                    attr.add(new MediaPrintableArea(0f, 0f, paperSize.getAutoWidth(), paperSize.getAutoHeight(), paperSize.getUnits()));
 
-                } else {
-                    attr.add(new MediaPrintableArea(0f, 0f, w / 72f, h / 72f, MediaSize.INCH));
+                    int w;
+                    int h;
+
+                    if (firstElement.getBufferedImage() != null) {
+                        w = firstElement.getBufferedImage().getWidth();
+                        h = firstElement.getBufferedImage().getHeight();
+                    } 
+                    else if (firstElement.getPDFFile() != null) {
+                        w = (int) firstElement.getPDFFile().getPage(1).getWidth();
+                        h = (int) firstElement.getPDFFile().getPage(1).getHeight();
+                    }
+                    else {
+                        throw new PrinterException("Corrupt or missing file supplied.");
+                    }
+
+                    HashPrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+
+                    if (paperSize != null) {
+                        attr.add(paperSize.getOrientationRequested());
+                        if (paperSize.isAutoSize()) {
+                            if(rawData.get(0).getType() == PrintJobElementType.TYPE_IMAGE_PS) {
+                                paperSize.setAutoSize(rawData.get(0).getBufferedImage());
+                            }
+                        }
+                        attr.add(new MediaPrintableArea(0f, 0f, paperSize.getAutoWidth(), paperSize.getAutoHeight(), paperSize.getUnits()));
+
+                    } else {
+                        attr.add(new MediaPrintableArea(0f, 0f, w / 72f, h / 72f, MediaSize.INCH));
+                    }
+
+                    job.setPrintService(printer.getPrintService());
+                    job.setPrintable(this);
+                    job.setJobName(title);
+                    job.print(attr);
+
+                } catch (PrinterException ex) {
+                    LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
+                } catch (IndexOutOfBoundsException ex) {
+                    LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
                 }
-                
-                job.setPrintService(printer.getPrintService());
-                job.setPrintable(this);
-                job.setJobName(title);
-                job.print(attr);
-
-            } catch (PrinterException ex) {
-                LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
-            } catch (IndexOutOfBoundsException ex) {
-                LogIt.log(Level.SEVERE, "Could not print PostScript job.", ex);
-            }            
+            }
         }
         else {
             LogIt.log(Level.WARNING, "Unsupported job type.");
