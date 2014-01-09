@@ -80,7 +80,8 @@ public class PrintSpooler implements Runnable {
     private Applet applet;
     private Throwable exception;
     private PrintService defaultPS;
-    
+    private boolean serialEnabled = false;
+            
     /**
      * The run loop will consistently check the spool List and call functions
      * based on the state of each PrintJob
@@ -149,7 +150,26 @@ public class PrintSpooler implements Runnable {
      */
     public void setApplet(Applet applet) {
         this.applet = applet;
-        serialPrinter = new SerialPrinter(applet);
+        serialPrinter = getSerialPrinter();
+    }
+    
+    /**
+     * Instantiates the <code>SerialPrinter</code>, or returns it if already
+     * created.
+     * @return 
+     */
+    private SerialPrinter getSerialPrinter() {
+        try {
+            Class.forName("jssc.SerialPort");
+            if (serialPrinter == null) {
+                serialPrinter = new SerialPrinter(applet);
+                serialEnabled = true;
+            }
+        } catch (ClassNotFoundException c) {
+            LogIt.log(Level.WARNING, "JSSC library could not be found. Serial functionality has been disabled.");
+            setException(c);
+        }
+        return serialPrinter;
     }
     
     /**
@@ -816,7 +836,12 @@ public class PrintSpooler implements Runnable {
      * findPorts starts the process of finding the list of serial ports.
      */
     public void findPorts() {
-        serialPrinter.findPorts();
+        if(serialEnabled) {
+            serialPrinter.findPorts();
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -825,7 +850,13 @@ public class PrintSpooler implements Runnable {
      * @return The list of ports
      */
     public String getPorts() {
-        return serialPrinter.getPorts();
+        if(serialEnabled) {
+            return serialPrinter.getPorts();
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+            return "";
+        }
     }
 
     /**
@@ -834,7 +865,12 @@ public class PrintSpooler implements Runnable {
      * @param portName The name of the port to open
      */
     public void openPort(String portName) {
-        serialPrinter.openPort(portName);
+        if(serialEnabled) {
+            serialPrinter.openPort(portName);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -845,7 +881,12 @@ public class PrintSpooler implements Runnable {
      * @param portName The name of the port to close. Only used in log.
      */
     public void closePort(String portName) {
-        serialPrinter.closePort(portName);
+        if(serialEnabled) {
+            serialPrinter.closePort(portName);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -854,7 +895,12 @@ public class PrintSpooler implements Runnable {
      * @param serialBegin The beginning character.
      */
     public void setSerialBegin(ByteArrayBuilder serialBegin) {
-        serialPrinter.setSerialBegin(serialBegin);
+        if(serialEnabled) {
+            serialPrinter.setSerialBegin(serialBegin);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -863,7 +909,13 @@ public class PrintSpooler implements Runnable {
      * @param serialEnd The ending character.
      */
     public void setSerialEnd(ByteArrayBuilder serialEnd) {
-        serialPrinter.setSerialEnd(serialEnd);
+        if(serialEnabled) {
+            serialPrinter.setSerialEnd(serialEnd);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
+
     }
 
     /**
@@ -876,7 +928,12 @@ public class PrintSpooler implements Runnable {
      * @param flowControl
      */
     public void setSerialProperties(String baud, String dataBits, String stopBits, String parity, String flowControl) {
-        serialPrinter.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
+        if(serialEnabled) {
+            serialPrinter.setSerialProperties(baud, dataBits, stopBits, parity, flowControl);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -885,7 +942,12 @@ public class PrintSpooler implements Runnable {
      * @param serialData A string of the data to send.
      */
     public void sendSerialData(String serialData) {
-        serialPrinter.send(serialData);
+        if(serialEnabled) {
+            serialPrinter.send(serialData);
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+        }
     }
 
     /**
@@ -894,7 +956,13 @@ public class PrintSpooler implements Runnable {
      * @return The returned data
      */
     public String getReturnData() {
-        return serialPrinter.getReturnData();
+        if(serialEnabled) {
+            return serialPrinter.getReturnData();
+        }
+        else {
+            LogIt.log(Level.WARNING, "Serial functionality has been disabled.");
+            return "";
+        }
     }
 
     /**
