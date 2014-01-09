@@ -79,6 +79,7 @@ public class PrintSpooler implements Runnable {
     private boolean alternatePrint;
     private Applet applet;
     private Throwable exception;
+    private PrintService defaultPS;
     
     /**
      * The run loop will consistently check the spool List and call functions
@@ -103,6 +104,7 @@ public class PrintSpooler implements Runnable {
         alternatePrint = false;
         exception = null;
         currentPrinter = null;
+        defaultPS = PrintServiceLookup.lookupDefaultPrintService();
         
         // Main loop
         while(running) {
@@ -558,12 +560,11 @@ public class PrintSpooler implements Runnable {
             ListIterator<Printer> iterator = printerList.listIterator();
             while(iterator.hasNext()) {
                 Printer printer = iterator.next();
-                PrintService defaultPS = PrintServiceLookup.lookupDefaultPrintService();
-                    if(printer.getPrintService().equals(defaultPS)) {
-                        currentPrinter = printer;
-                        break;
-                    }
+                if(printer.getPrintService().equals(defaultPS)) {
+                    currentPrinter = printer;
+                    break;
                 }
+            }
         }
         else {
             // Do a 3 pass compare to match the printer. Look for an exact match
